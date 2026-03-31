@@ -1,0 +1,19 @@
+{
+    "name": "DarkPurple",
+    "colors": {
+        "PrimaryBackground": "#1a1a2e",
+        "SecondaryBackground": "#16213e",
+        "TertiaryBackground": "#0f3460",
+        "Foreground": "#eaeaea",
+        "Accent": "#9d4edd",
+        "AccentDark": "#7b2cbf",
+        "Border": "#5a189a",
+        "ButtonBackground": "#3a0ca3",
+        "ButtonHover": "#5a189a",
+        "ButtonPressed": "#7b2cbf",
+        "Success": "#06d6a0",
+        "Error": "#ef476f",
+        "Warning": "#ffd166",
+        "Info": "#118ab2"
+    }
+}

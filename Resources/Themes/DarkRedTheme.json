@@ -1,0 +1,19 @@
+{
+  "name": "DarkRed",
+  "colors": {
+    "PrimaryBackground": "#1a0f0f",
+    "SecondaryBackground": "#2d1a1a",
+    "TertiaryBackground": "#3d2323",
+    "Foreground": "#f0e0e0",
+    "Accent": "#cc4444",
+    "AccentDark": "#8b0000",
+    "Border": "#5c0000",
+    "ButtonBackground": "#8b3333",
+    "ButtonHover": "#a84444",
+    "ButtonPressed": "#cc4444",
+    "Success": "#44cc77",
+    "Error": "#ff6666",
+    "Warning": "#ffaa44",
+    "Info": "#4488cc"
+  }
+}

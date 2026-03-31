@@ -1,0 +1,345 @@
+<Window x:Class="HangmanWpf.Views.GameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hangman - Game"
+        Height="700"
+        Width="900"
+        Background="{DynamicResource PrimaryBackground}"
+        Foreground="{DynamicResource Foreground}"
+        WindowStartupLocation="CenterScreen">
+    <DockPanel>
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top"
+                Background="{DynamicResource SecondaryBackground}"
+                Foreground="{DynamicResource Foreground}">
+            <MenuItem Header="File">
+                <MenuItem Header="New Game"
+                        Command="{Binding StartNewGameCommand}"/>
+                <MenuItem Header="Load Game"
+                        Command="{Binding LoadGameCommand}"/>
+                <MenuItem Header="Save Game"
+                        Command="{Binding SaveGameCommand}"/>
+                <Separator/>
+                <MenuItem Header="Exit"
+                        Command="{Binding CancelCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Category">
+                <MenuItem Header="Movies"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="Movies"/>
+                <MenuItem Header="Cars"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="Cars"/>
+                <MenuItem Header="Rivers"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="Rivers"/>
+                <MenuItem Header="Mountains"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="Mountains"/>
+                <MenuItem Header="States"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="States"/>
+                <MenuItem Header="Animals"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="Animals"/>
+                <MenuItem Header="Countries"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="Countries"/>
+                <MenuItem Header="All Categories"
+                        Command="{Binding ChangeCategoryCommand}"
+                        CommandParameter="All Categories"/>
+            </MenuItem>
+            <MenuItem Header="Theme">
+                <MenuItem Header="Dark Purple"
+                        Click="OnThemePurpleClick"/>
+                <MenuItem Header="Dark Red"
+                        Click="OnThemeRedClick"/>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="About"
+                        Click="OnAboutMenuClick"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Main Content -->
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Panel: User Info & Hangman -->
+            <StackPanel Grid.Column="0"
+                    Margin="0,0,20,0">
+                <!-- User Info -->
+                <TextBlock Text="{Binding CurrentUser.Username}"
+                           FontSize="18"
+                        FontWeight="Bold"
+                           Foreground="{DynamicResource Accent}"
+                           Margin="0,0,0,10"/>
+                <Image Source="{Binding CurrentUser.ImagePath}"
+                       Width="80"
+                        Height="80"
+                       Margin="0,0,0,20"/>
+
+                <!-- Hangman Art -->
+                <TextBlock Text="{Binding HangmanDisplay}"
+                           FontFamily="Courier New"
+                           FontSize="12"
+                           Foreground="{DynamicResource Foreground}"
+                           Margin="0,0,0,20"/>
+
+                <!-- Stats -->
+                <Border Background="{DynamicResource SecondaryBackground}"
+                        Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="{Binding StringFormat='Level: {0}/3', Path=Level}"
+                                   Foreground="{DynamicResource Accent}"
+                                   Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding StringFormat='Wrong: {0}/6', Path=WrongCount}"
+                                   Foreground="{DynamicResource Error}"
+                                   Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding StringFormat='Timer: {0}s', Path=TimerSeconds}"
+                                   Foreground="{DynamicResource Info}"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- Center Panel: Word & Buttons -->
+            <StackPanel Grid.Column="1">
+                <!-- Word Display -->
+                <TextBlock Text="{Binding WordDisplay}"
+                           FontSize="48"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource Accent}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,30"
+                           Padding="20"
+                           Background="{DynamicResource SecondaryBackground}"/>
+
+                <!-- Status Message -->
+                <TextBlock Text="{Binding StatusMessage}"
+                           FontSize="14"
+                           Foreground="{DynamicResource Success}"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,20"
+                           Height="40"/>
+
+                <!-- Letter Buttons -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <!-- A-L -->
+                    <Button Grid.Column="0"
+                            Grid.Row="0"
+                            Content="A"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="A"
+                            Margin="2"/>
+                    <Button Grid.Column="1"
+                            Grid.Row="0"
+                            Content="B"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="B"
+                            Margin="2"/>
+                    <Button Grid.Column="2"
+                            Grid.Row="0"
+                            Content="C"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="C"
+                            Margin="2"/>
+                    <Button Grid.Column="3"
+                            Grid.Row="0"
+                            Content="D"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="D"
+                            Margin="2"/>
+                    <Button Grid.Column="4"
+                            Grid.Row="0"
+                            Content="E"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="E"
+                            Margin="2"/>
+                    <Button Grid.Column="5"
+                            Grid.Row="0"
+                            Content="F"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="F"
+                            Margin="2"/>
+                    <Button Grid.Column="6"
+                            Grid.Row="0"
+                            Content="G"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="G"
+                            Margin="2"/>
+                    <Button Grid.Column="7"
+                            Grid.Row="0"
+                            Content="H"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="H"
+                            Margin="2"/>
+                    <Button Grid.Column="8"
+                            Grid.Row="0"
+                            Content="I"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="I"
+                            Margin="2"/>
+                    <Button Grid.Column="9"
+                            Grid.Row="0"
+                            Content="J"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="J"
+                            Margin="2"/>
+                    <Button Grid.Column="10"
+                            Grid.Row="0"
+                            Content="K"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="K"
+                            Margin="2"/>
+                    <Button Grid.Column="11"
+                            Grid.Row="0"
+                            Content="L"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="L"
+                            Margin="2"/>
+
+                    <!-- M-X -->
+                    <Button Grid.Column="0"
+                            Grid.Row="1"
+                            Content="M"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="M"
+                            Margin="2"/>
+                    <Button Grid.Column="1"
+                            Grid.Row="1"
+                            Content="N"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="N"
+                            Margin="2"/>
+                    <Button Grid.Column="2"
+                            Grid.Row="1"
+                            Content="O"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="O"
+                            Margin="2"/>
+                    <Button Grid.Column="3"
+                            Grid.Row="1"
+                            Content="P"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="P"
+                            Margin="2"/>
+                    <Button Grid.Column="4"
+                            Grid.Row="1"
+                            Content="Q"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="Q"
+                            Margin="2"/>
+                    <Button Grid.Column="5"
+                            Grid.Row="1"
+                            Content="R"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="R"
+                            Margin="2"/>
+                    <Button Grid.Column="6"
+                            Grid.Row="1"
+                            Content="S"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="S"
+                            Margin="2"/>
+                    <Button Grid.Column="7"
+                            Grid.Row="1"
+                            Content="T"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="T"
+                            Margin="2"/>
+                    <Button Grid.Column="8"
+                            Grid.Row="1"
+                            Content="U"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="U"
+                            Margin="2"/>
+                    <Button Grid.Column="9"
+                            Grid.Row="1"
+                            Content="V"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="V"
+                            Margin="2"/>
+                    <Button Grid.Column="10"
+                            Grid.Row="1"
+                            Content="W"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="W"
+                            Margin="2"/>
+                    <Button Grid.Column="11"
+                            Grid.Row="1"
+                            Content="X"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="X"
+                            Margin="2"/>
+
+                    <!-- Y-Z + Action -->
+                    <Button Grid.Column="0"
+                            Grid.Row="2"
+                            Content="Y"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="Y"
+                            Margin="2"/>
+                    <Button Grid.Column="1"
+                            Grid.Row="2"
+                            Content="Z"
+                            Command="{Binding GuessLetterCommand}"
+                            CommandParameter="Z"
+                            Margin="2"/>
+                    <Button Grid.Column="2"
+                            Grid.Row="2"
+                            Grid.ColumnSpan="5"
+                            Content="New Game"
+                            Command="{Binding StartNewGameCommand}"
+                            Margin="2"/>
+                    <Button Grid.Column="7"
+                            Grid.Row="2"
+                            Grid.ColumnSpan="5"
+                            Content="Exit"
+                            Command="{Binding CancelCommand}"
+                            Margin="2"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- Right Panel: Category Info -->
+            <StackPanel Grid.Column="2"
+                    Margin="20,0,0,0">
+                <TextBlock Text="Category"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="{DynamicResource Accent}"
+                        Margin="0,0,0,10"/>
+                <TextBlock Text="{Binding Category}"
+                           FontSize="16"
+                           Foreground="{DynamicResource Foreground}"
+                           Padding="10"
+                           Background="{DynamicResource SecondaryBackground}"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>

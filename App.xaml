@@ -3,5 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="Views/LoginWindow.xaml">
     <Application.Resources>
+        <!-- Default theme colors (will be overridden by ThemeService at startup) -->
+        <!-- These DynamicResources are defined here so they're accessible throughout the app -->
+        <!-- Colors are loaded from theme JSON files in Resources/Themes/ -->
+        
+        <!-- Primary Colors -->
+        <SolidColorBrush x:Key="PrimaryBackground">#1a1a2e</SolidColorBrush>
+        <SolidColorBrush x:Key="SecondaryBackground">#16213e</SolidColorBrush>
+        <SolidColorBrush x:Key="TertiaryBackground">#0f3460</SolidColorBrush>
+        <SolidColorBrush x:Key="Foreground">#eaeaea</SolidColorBrush>
+        
+        <!-- Accent Colors -->
+        <SolidColorBrush x:Key="Accent">#9d4edd</SolidColorBrush>
+        <SolidColorBrush x:Key="AccentDark">#7b2cbf</SolidColorBrush>
+        <SolidColorBrush x:Key="Border">#5a189a</SolidColorBrush>
+        
+        <!-- Button Colors -->
+        <SolidColorBrush x:Key="ButtonBackground">#3a0ca3</SolidColorBrush>
+        <SolidColorBrush x:Key="ButtonHover">#5a189a</SolidColorBrush>
+        <SolidColorBrush x:Key="ButtonPressed">#7b2cbf</SolidColorBrush>
+        
+        <!-- Status Colors -->
+        <SolidColorBrush x:Key="Success">#06d6a0</SolidColorBrush>
+        <SolidColorBrush x:Key="Error">#ef476f</SolidColorBrush>
+        <SolidColorBrush x:Key="Warning">#ffd166</SolidColorBrush>
+        <SolidColorBrush x:Key="Info">#118ab2</SolidColorBrush>
     </Application.Resources>
 </Application>
