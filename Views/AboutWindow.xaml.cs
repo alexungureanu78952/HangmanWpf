@@ -16,6 +16,34 @@ namespace HangmanWpf.Views
             // Set DataContext to AboutWindowViewModel from DI container
             var viewModel = App.ServiceProvider.GetRequiredService<AboutWindowViewModel>();
             DataContext = viewModel;
+            DataContextChanged += OnDataContextChanged;
+            Closed += OnClosed;
+        }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue is AboutWindowViewModel oldVm)
+            {
+                oldVm.CloseRequested -= HandleCloseRequested;
+            }
+
+            if (e.NewValue is AboutWindowViewModel newVm)
+            {
+                newVm.CloseRequested += HandleCloseRequested;
+            }
+        }
+
+        private void OnClosed(object? sender, System.EventArgs e)
+        {
+            if (DataContext is AboutWindowViewModel vm)
+            {
+                vm.CloseRequested -= HandleCloseRequested;
+            }
+        }
+
+        private void HandleCloseRequested()
+        {
+            Close();
         }
     }
 }

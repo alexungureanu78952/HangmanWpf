@@ -17,7 +17,6 @@ public class SaveLoadDialogViewModel : ViewModelBase
     private Guid _userId;
     private ObservableCollection<SavedGame> _savedGames;
     private SavedGame? _selectedGame;
-    private string _saveName;
     private bool _isLoading;
 
     public ObservableCollection<SavedGame> SavedGames
@@ -37,12 +36,6 @@ public class SaveLoadDialogViewModel : ViewModelBase
         }
     }
 
-    public string SaveName
-    {
-        get => _saveName;
-        set => SetProperty(ref _saveName, value);
-    }
-
     public bool IsLoading
     {
         get => _isLoading;
@@ -50,7 +43,6 @@ public class SaveLoadDialogViewModel : ViewModelBase
     }
 
     public ICommand LoadSavedGamesCommand { get; }
-    public ICommand SaveGameCommand { get; }
     public ICommand LoadGameCommand { get; }
     public ICommand DeleteGameCommand { get; }
     public ICommand CancelCommand { get; }
@@ -64,11 +56,9 @@ public class SaveLoadDialogViewModel : ViewModelBase
         _userId = Guid.Empty;
         _savedGames = new ObservableCollection<SavedGame>();
         _selectedGame = null;
-        _saveName = string.Empty;
         _isLoading = false;
 
         LoadSavedGamesCommand = new AsyncRelayCommand(LoadSavedGamesAsync);
-        SaveGameCommand = new AsyncRelayCommand(SaveGameAsync, () => !string.IsNullOrWhiteSpace(SaveName));
         LoadGameCommand = new RelayCommand(_ => OnLoadGame(), _ => SelectedGame != null);
         DeleteGameCommand = new RelayCommand(_ => OnDeleteGame(), _ => SelectedGame != null);
         CancelCommand = new RelayCommand(_ => OnCancel());
@@ -106,14 +96,6 @@ public class SaveLoadDialogViewModel : ViewModelBase
         {
             IsLoading = false;
         }
-    }
-
-    /// <summary>
-    /// Save a game (placeholder - actual save done in GameWindowViewModel)
-    /// </summary>
-    private async System.Threading.Tasks.Task SaveGameAsync()
-    {
-        await System.Threading.Tasks.Task.CompletedTask;
     }
 
     /// <summary>

@@ -17,6 +17,7 @@ namespace HangmanWpf.Services;
 public class UserService : IUserService
 {
     private const string UsersFilePath = "Resources/Data/users.json";
+    private const string UserImagesPath = "Resources/Data/UserImages";
     private readonly IStatisticsService _statisticsService;
     private readonly IGamePersistenceService _gamePersistenceService;
 
@@ -34,10 +35,15 @@ public class UserService : IUserService
         if (string.IsNullOrWhiteSpace(username))
             throw new ArgumentException("Username cannot be empty", nameof(username));
 
+        if (username.Any(char.IsWhiteSpace))
+            throw new ArgumentException("Username must be a single word", nameof(username));
+
         if (string.IsNullOrWhiteSpace(imagePath))
             throw new ArgumentException("Image path cannot be empty", nameof(imagePath));
 
-        var user = new User(username, imagePath);
+        var persistedImagePath = CopyImageToDataFolder(imagePath);
+
+        var user = new User(username, persistedImagePath);
         var users = await GetAllUsersAsync();
 
         // Check duplicate username
@@ -48,6 +54,31 @@ public class UserService : IUserService
         await SaveUsersAsync(users);
 
         return user;
+    }
+
+    private string CopyImageToDataFolder(string imagePath)
+    {
+        var extension = Path.GetExtension(imagePath).ToLowerInvariant();
+        if (extension != ".jpg" && extension != ".jpeg" && extension != ".gif" && extension != ".png")
+            throw new ArgumentException("Supported image types are jpg, jpeg, gif, png", nameof(imagePath));
+
+        var sourcePath = Path.IsPathRooted(imagePath)
+            ? imagePath
+            : PathHelpers.GetRelativePath(imagePath);
+
+        if (!File.Exists(sourcePath))
+            throw new FileNotFoundException("Selected image file does not exist", sourcePath);
+
+        var relativeTargetDir = UserImagesPath;
+        var absoluteTargetDir = PathHelpers.GetRelativePath(relativeTargetDir);
+        if (!Directory.Exists(absoluteTargetDir))
+            Directory.CreateDirectory(absoluteTargetDir);
+
+        var fileName = $"{Guid.NewGuid()}{extension}";
+        var absoluteTargetPath = Path.Combine(absoluteTargetDir, fileName);
+        File.Copy(sourcePath, absoluteTargetPath, overwrite: true);
+
+        return $"{relativeTargetDir}/{fileName}".Replace('\\', '/');
     }
 
     /// <summary>

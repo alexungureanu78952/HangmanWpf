@@ -25,6 +25,14 @@ public class WordService : IWordService
     {
         var allWords = await LoadAllWordsAsync();
 
+        if (category.Equals("All Categories", StringComparison.OrdinalIgnoreCase))
+        {
+            return allWords.Values
+                .SelectMany(words => words)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
         if (allWords.TryGetValue(category, out var words))
             return new List<string>(words);
 
@@ -38,7 +46,14 @@ public class WordService : IWordService
     public async Task<List<string>> GetAllCategoriesAsync()
     {
         var allWords = await LoadAllWordsAsync();
-        return allWords.Keys.ToList();
+
+        var categories = allWords.Keys.ToList();
+        if (!categories.Contains("All Categories", StringComparer.OrdinalIgnoreCase))
+        {
+            categories.Insert(0, "All Categories");
+        }
+
+        return categories;
     }
 
     /// <summary>

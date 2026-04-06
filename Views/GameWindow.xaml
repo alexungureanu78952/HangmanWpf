@@ -139,15 +139,23 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                        <Border Margin="2"
+                                                        <Button Content="{Binding Letter}"
+                                                                Command="{Binding DataContext.GuessLetterCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding Letter}"
+                                                                IsHitTestVisible="{Binding IsClickable}"
+                                                                Focusable="False"
+                                                                Margin="2"
                                                                 MinWidth="28"
                                                                 MinHeight="28"
                                                                 Padding="4"
                                                                 BorderThickness="1"
-                                                                BorderBrush="{DynamicResource Border}">
-                                                                <Border.Style>
-                                                                        <Style TargetType="Border">
+                                                                BorderBrush="{DynamicResource Border}"
+                                                                Foreground="{DynamicResource Foreground}">
+                                                                <Button.Style>
+                                                                        <Style TargetType="Button">
                                                                                 <Setter Property="Background" Value="{DynamicResource SecondaryBackground}"/>
+                                                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                                                <Setter Property="Opacity" Value="1"/>
                                                                                 <Style.Triggers>
                                                                                         <DataTrigger Binding="{Binding State}" Value="Correct">
                                                                                                 <Setter Property="Background" Value="{DynamicResource Success}"/>
@@ -155,15 +163,13 @@
                                                                                         <DataTrigger Binding="{Binding State}" Value="Wrong">
                                                                                                 <Setter Property="Background" Value="{DynamicResource Error}"/>
                                                                                         </DataTrigger>
+                                                                                        <DataTrigger Binding="{Binding IsClickable}" Value="False">
+                                                                                                <Setter Property="Opacity" Value="0.9"/>
+                                                                                        </DataTrigger>
                                                                                 </Style.Triggers>
                                                                         </Style>
-                                                                </Border.Style>
-                                                                <TextBlock Text="{Binding Letter}"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           FontWeight="Bold"
-                                                                           Foreground="{DynamicResource Foreground}"/>
-                                                        </Border>
+                                                                </Button.Style>
+                                                        </Button>
                                                 </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                 </ItemsControl>

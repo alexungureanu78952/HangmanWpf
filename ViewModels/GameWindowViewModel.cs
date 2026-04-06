@@ -142,6 +142,7 @@ public class GameWindowViewModel : ViewModelBase
     public ICommand CancelCommand { get; }
 
     public event Action? GameClosed;
+    public event Action? OpenGameRequested;
 
     public GameWindowViewModel(
         IGameService gameService,
@@ -174,7 +175,7 @@ public class GameWindowViewModel : ViewModelBase
         StartNewGameCommand = new AsyncRelayCommand(StartNewGameAsync);
         GuessLetterCommand = new RelayCommand(param => GuessLetter(param), param => GameInProgress && !WordComplete);
         SaveGameCommand = new AsyncRelayCommand(SaveGameAsync, () => GameInProgress);
-        LoadGameCommand = new AsyncRelayCommand(LoadGameAsync, () => true);
+        LoadGameCommand = new RelayCommand(_ => OnOpenGameRequested());
         ChangeThemeCommand = new AsyncRelayCommand(async () => await ChangeThemeAsync("DarkRed"));
         ChangeCategoryCommand = new RelayCommand(param => OnChangeCategory(param));
         CancelCommand = new RelayCommand(_ => OnCancel());
@@ -381,27 +382,25 @@ public class GameWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Load a saved game
+    /// Open the save/load dialog.
     /// </summary>
-    private async System.Threading.Tasks.Task LoadGameAsync()
+    private void OnOpenGameRequested()
     {
-        if (CurrentUser.UserId == Guid.Empty)
+        OpenGameRequested?.Invoke();
+    }
+
+    /// <summary>
+    /// Restore a selected saved game.
+    /// </summary>
+    public async System.Threading.Tasks.Task RestoreSavedGameAsync(SavedGame loadedGame)
+    {
+        if (loadedGame == null)
         {
-            StatusMessage = "Select a valid user before opening a saved game.";
             return;
         }
 
         try
         {
-            var savedGames = await _persistenceService.GetSavedGamesAsync(CurrentUser.UserId);
-            if (savedGames.Count == 0)
-            {
-                StatusMessage = "No saved games found.";
-                return;
-            }
-
-            // Load the latest save for the current user.
-            var loadedGame = savedGames.OrderByDescending(g => g.SavedAt).First();
             await _gameService.RestoreFromSaveAsync(loadedGame);
 
             GameInProgress = true;
