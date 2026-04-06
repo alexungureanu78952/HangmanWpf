@@ -27,9 +27,7 @@ public class CategoryStats
     /// </summary>
     public int GamesWon { get; set; }
 
-    public CategoryStats()
-    {
-    }
+
 
     public CategoryStats(string category)
     {

@@ -24,12 +24,5 @@ public class ThemeDefinition
     /// </summary>
     public Dictionary<string, string> Colors { get; set; } = new();
 
-    public ThemeDefinition()
-    {
-    }
 
-    public ThemeDefinition(string name)
-    {
-        Name = name;
-    }
 }

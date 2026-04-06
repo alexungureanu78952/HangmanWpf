@@ -91,7 +91,7 @@ public class WordService : IWordService
             }
 
             var json = await File.ReadAllTextAsync(filePath);
-            _wordCache = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(json) 
+            _wordCache = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(json)
                 ?? new Dictionary<string, List<string>>();
 
             return _wordCache;

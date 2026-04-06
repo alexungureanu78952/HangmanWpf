@@ -4,7 +4,6 @@ using HangmanWpf.Utilities;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
@@ -18,6 +17,7 @@ public class StatisticsWindowViewModel : ViewModelBase
     private readonly IStatisticsService _statisticsService;
     private readonly IUserService _userService;
     private readonly IWordService _wordService;
+    private readonly IUiDispatcher _uiDispatcher;
     private ObservableCollection<StatisticsRow> _statisticsRows;
     private bool _isLoading;
 
@@ -41,11 +41,13 @@ public class StatisticsWindowViewModel : ViewModelBase
     public StatisticsWindowViewModel(
         IStatisticsService statisticsService,
         IUserService userService,
-        IWordService wordService)
+        IWordService wordService,
+        IUiDispatcher uiDispatcher)
     {
         _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _wordService = wordService ?? throw new ArgumentNullException(nameof(wordService));
+        _uiDispatcher = uiDispatcher ?? throw new ArgumentNullException(nameof(uiDispatcher));
         _statisticsRows = new ObservableCollection<StatisticsRow>();
         _isLoading = false;
 
@@ -117,20 +119,13 @@ public class StatisticsWindowViewModel : ViewModelBase
 
     private void OnStatisticsChanged()
     {
-        if (Application.Current?.Dispatcher == null)
+        if (_uiDispatcher.CheckAccess())
         {
             _ = LoadStatisticsAsync();
             return;
         }
 
-        if (Application.Current.Dispatcher.CheckAccess())
-        {
-            _ = LoadStatisticsAsync();
-        }
-        else
-        {
-            Application.Current.Dispatcher.InvokeAsync(() => LoadStatisticsAsync());
-        }
+        _ = _uiDispatcher.InvokeAsync(() => _ = LoadStatisticsAsync());
     }
 }
 

@@ -1,7 +1,5 @@
-using HangmanWpf.Services.Interfaces;
 using HangmanWpf.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -26,7 +24,6 @@ namespace HangmanWpf.Views
             if (_gameVm != null)
             {
                 _gameVm.GameClosed += OnGameClosed;
-                _gameVm.OpenGameRequested += OnOpenGameRequested;
             }
 
             // Subscribe to keyboard input
@@ -93,8 +90,11 @@ namespace HangmanWpf.Views
 
             if (e.Key == Key.F1)
             {
-                OnAboutMenuClick(this, new RoutedEventArgs());
-                e.Handled = true;
+                if (vm.ShowAboutCommand.CanExecute(null))
+                {
+                    vm.ShowAboutCommand.Execute(null);
+                    e.Handled = true;
+                }
 
                 return;
             }
@@ -127,81 +127,9 @@ namespace HangmanWpf.Views
             if (_gameVm != null)
             {
                 _gameVm.GameClosed -= OnGameClosed;
-                _gameVm.OpenGameRequested -= OnOpenGameRequested;
             }
 
             this.PreviewKeyDown -= GameWindow_PreviewKeyDown;
-        }
-
-        /// <summary>
-        /// Handle About menu click
-        /// </summary>
-        private void OnAboutMenuClick(object sender, System.Windows.RoutedEventArgs e)
-        {
-            var aboutWindow = new AboutWindow();
-            aboutWindow.ShowDialog();
-        }
-
-        /// <summary>
-        /// Handle Dark Purple theme
-        /// </summary>
-        private async void OnThemePurpleClick(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (_gameVm != null)
-            {
-                var themeService = App.ServiceProvider.GetRequiredService<IThemeService>();
-                await themeService.ApplyThemeAsync("DarkPurple");
-            }
-        }
-
-        /// <summary>
-        /// Handle Dark Red theme
-        /// </summary>
-        private async void OnThemeRedClick(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (_gameVm != null)
-            {
-                var themeService = App.ServiceProvider.GetRequiredService<IThemeService>();
-                await themeService.ApplyThemeAsync("DarkRed");
-            }
-        }
-
-        /// <summary>
-        /// Handle Statistics menu click
-        /// </summary>
-        private void OnStatisticsMenuClick(object sender, RoutedEventArgs e)
-        {
-            var statisticsWindow = new StatisticsWindow
-            {
-                Owner = this
-            };
-            statisticsWindow.ShowDialog();
-        }
-
-        private async void OnOpenGameRequested()
-        {
-            if (_gameVm == null || _gameVm.CurrentUser.UserId == Guid.Empty)
-            {
-                return;
-            }
-
-            var dialog = new SaveLoadDialog
-            {
-                Owner = this
-            };
-
-            var dialogVm = (SaveLoadDialogViewModel)dialog.DataContext;
-            dialogVm.Initialize(_gameVm.CurrentUser.UserId);
-
-            dialogVm.GameLoaded += async savedGame =>
-            {
-                await _gameVm.RestoreSavedGameAsync(savedGame);
-                dialog.Close();
-            };
-
-            dialogVm.CancellationRequested += () => dialog.Close();
-
-            dialog.ShowDialog();
         }
     }
 }

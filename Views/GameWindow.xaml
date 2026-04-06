@@ -20,7 +20,7 @@
                                 <MenuItem Header="Save Game"
                                           Command="{Binding SaveGameCommand}"/>
                                 <MenuItem Header="Statistics"
-                                          Click="OnStatisticsMenuClick"/>
+                                          Command="{Binding ShowStatisticsCommand}"/>
                                 <Separator/>
                                 <MenuItem Header="Cancel"
                                           Command="{Binding CancelCommand}"/>
@@ -53,13 +53,15 @@
                         </MenuItem>
                         <MenuItem Header="Theme">
                                 <MenuItem Header="Dark Purple"
-                                          Click="OnThemePurpleClick"/>
+                                          Command="{Binding ChangeThemeCommand}"
+                                          CommandParameter="DarkPurple"/>
                                 <MenuItem Header="Dark Red"
-                                          Click="OnThemeRedClick"/>
+                                          Command="{Binding ChangeThemeCommand}"
+                                          CommandParameter="DarkRed"/>
                         </MenuItem>
                         <MenuItem Header="Help">
                                 <MenuItem Header="About"
-                                          Click="OnAboutMenuClick"/>
+                                          Command="{Binding ShowAboutCommand}"/>
                         </MenuItem>
                 </Menu>
 
@@ -153,18 +155,27 @@
                                                                 Foreground="{DynamicResource Foreground}">
                                                                 <Button.Style>
                                                                         <Style TargetType="Button">
-                                                                                <Setter Property="Background" Value="{DynamicResource SecondaryBackground}"/>
-                                                                                <Setter Property="FontWeight" Value="Bold"/>
-                                                                                <Setter Property="Opacity" Value="1"/>
+                                                                                <Setter Property="Background"
+                                                                                        Value="{DynamicResource SecondaryBackground}"/>
+                                                                                <Setter Property="FontWeight"
+                                                                                        Value="Bold"/>
+                                                                                <Setter Property="Opacity"
+                                                                                        Value="1"/>
                                                                                 <Style.Triggers>
-                                                                                        <DataTrigger Binding="{Binding State}" Value="Correct">
-                                                                                                <Setter Property="Background" Value="{DynamicResource Success}"/>
+                                                                                        <DataTrigger Binding="{Binding State}"
+                                                                                                     Value="Correct">
+                                                                                                <Setter Property="Background"
+                                                                                                        Value="{DynamicResource Success}"/>
                                                                                         </DataTrigger>
-                                                                                        <DataTrigger Binding="{Binding State}" Value="Wrong">
-                                                                                                <Setter Property="Background" Value="{DynamicResource Error}"/>
+                                                                                        <DataTrigger Binding="{Binding State}"
+                                                                                                     Value="Wrong">
+                                                                                                <Setter Property="Background"
+                                                                                                        Value="{DynamicResource Error}"/>
                                                                                         </DataTrigger>
-                                                                                        <DataTrigger Binding="{Binding IsClickable}" Value="False">
-                                                                                                <Setter Property="Opacity" Value="0.9"/>
+                                                                                        <DataTrigger Binding="{Binding IsClickable}"
+                                                                                                     Value="False">
+                                                                                                <Setter Property="Opacity"
+                                                                                                        Value="0.9"/>
                                                                                         </DataTrigger>
                                                                                 </Style.Triggers>
                                                                         </Style>

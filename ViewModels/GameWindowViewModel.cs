@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
@@ -21,6 +20,8 @@ public class GameWindowViewModel : ViewModelBase
     private readonly IGamePersistenceService _persistenceService;
     private readonly IStatisticsService _statisticsService;
     private readonly IThemeService _themeService;
+    private readonly IGameDialogService _gameDialogService;
+    private readonly IUiDispatcher _uiDispatcher;
 
     private User _currentUser;
     private string _category;
@@ -139,23 +140,28 @@ public class GameWindowViewModel : ViewModelBase
     public ICommand LoadGameCommand { get; }
     public ICommand ChangeThemeCommand { get; }
     public ICommand ChangeCategoryCommand { get; }
+    public ICommand ShowStatisticsCommand { get; }
+    public ICommand ShowAboutCommand { get; }
     public ICommand CancelCommand { get; }
 
     public event Action? GameClosed;
-    public event Action? OpenGameRequested;
 
     public GameWindowViewModel(
         IGameService gameService,
         IWordService wordService,
         IGamePersistenceService persistenceService,
         IStatisticsService statisticsService,
-        IThemeService themeService)
+        IThemeService themeService,
+        IGameDialogService gameDialogService,
+        IUiDispatcher uiDispatcher)
     {
         _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
         _wordService = wordService ?? throw new ArgumentNullException(nameof(wordService));
         _persistenceService = persistenceService ?? throw new ArgumentNullException(nameof(persistenceService));
         _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
         _themeService = themeService ?? throw new ArgumentNullException(nameof(themeService));
+        _gameDialogService = gameDialogService ?? throw new ArgumentNullException(nameof(gameDialogService));
+        _uiDispatcher = uiDispatcher ?? throw new ArgumentNullException(nameof(uiDispatcher));
 
         _currentUser = new User();
         _category = "Movies";
@@ -175,9 +181,11 @@ public class GameWindowViewModel : ViewModelBase
         StartNewGameCommand = new AsyncRelayCommand(StartNewGameAsync);
         GuessLetterCommand = new RelayCommand(param => GuessLetter(param), param => GameInProgress && !WordComplete);
         SaveGameCommand = new AsyncRelayCommand(SaveGameAsync, () => GameInProgress);
-        LoadGameCommand = new RelayCommand(_ => OnOpenGameRequested());
-        ChangeThemeCommand = new AsyncRelayCommand(async () => await ChangeThemeAsync("DarkRed"));
+        LoadGameCommand = new AsyncRelayCommand(OpenSavedGameAsync);
+        ChangeThemeCommand = new AsyncRelayCommand<string>(ChangeThemeAsync);
         ChangeCategoryCommand = new RelayCommand(param => OnChangeCategory(param));
+        ShowStatisticsCommand = new AsyncRelayCommand(ShowStatisticsAsync);
+        ShowAboutCommand = new AsyncRelayCommand(ShowAboutAsync);
         CancelCommand = new RelayCommand(_ => OnCancel());
 
         _ = LoadCategoriesAsync();
@@ -233,8 +241,8 @@ public class GameWindowViewModel : ViewModelBase
             StatusMessage = "Game started! Guess a letter.";
 
             _gameService.StartTimer(
-                onTimeUpdate: seconds => RunOnUiThread(() => TimerSeconds = seconds),
-                onTimeoutCallback: () => RunOnUiThread(OnTimeout)
+                onTimeUpdate: seconds => _uiDispatcher.Invoke(() => TimerSeconds = seconds),
+                onTimeoutCallback: () => _uiDispatcher.Invoke(OnTimeout)
             );
 
             RefreshCommandStates();
@@ -381,12 +389,28 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Open the save/load dialog.
-    /// </summary>
-    private void OnOpenGameRequested()
+    private async System.Threading.Tasks.Task OpenSavedGameAsync()
     {
-        OpenGameRequested?.Invoke();
+        if (CurrentUser.UserId == Guid.Empty)
+        {
+            return;
+        }
+
+        var loadedGame = await _gameDialogService.ShowLoadGameDialogAsync(CurrentUser.UserId);
+        if (loadedGame != null)
+        {
+            await RestoreSavedGameAsync(loadedGame);
+        }
+    }
+
+    private System.Threading.Tasks.Task ShowStatisticsAsync()
+    {
+        return _gameDialogService.ShowStatisticsDialogAsync();
+    }
+
+    private System.Threading.Tasks.Task ShowAboutAsync()
+    {
+        return _gameDialogService.ShowAboutDialogAsync();
     }
 
     /// <summary>
@@ -422,8 +446,8 @@ public class GameWindowViewModel : ViewModelBase
             StatusMessage = $"Game loaded: {loadedGame.SaveName}";
 
             _gameService.StartTimer(
-                onTimeUpdate: seconds => RunOnUiThread(() => TimerSeconds = seconds),
-                onTimeoutCallback: () => RunOnUiThread(OnTimeout)
+                onTimeUpdate: seconds => _uiDispatcher.Invoke(() => TimerSeconds = seconds),
+                onTimeoutCallback: () => _uiDispatcher.Invoke(OnTimeout)
             );
 
             RefreshCommandStates();
@@ -448,29 +472,16 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    private static void RunOnUiThread(Action action)
-    {
-        if (Application.Current?.Dispatcher == null)
-        {
-            action();
-            return;
-        }
-
-        if (Application.Current.Dispatcher.CheckAccess())
-        {
-            action();
-        }
-        else
-        {
-            Application.Current.Dispatcher.Invoke(action);
-        }
-    }
-
     /// <summary>
     /// Change theme
     /// </summary>
-    private async System.Threading.Tasks.Task ChangeThemeAsync(string themeName)
+    private async System.Threading.Tasks.Task ChangeThemeAsync(string? themeName)
     {
+        if (string.IsNullOrWhiteSpace(themeName))
+        {
+            return;
+        }
+
         try
         {
             await _themeService.ApplyThemeAsync(themeName);

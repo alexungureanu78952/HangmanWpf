@@ -1,7 +1,6 @@
 using HangmanWpf.Models;
 using HangmanWpf.Services.Interfaces;
 using HangmanWpf.Utilities;
-using Microsoft.Win32;
 using System;
 using System.Windows.Input;
 
@@ -61,6 +60,7 @@ public class NewUserWindowViewModel : ViewModelBase
 
     public event Action<User>? UserCreated;
     public event Action? CancellationRequested;
+    public event Action? BrowseImageRequested;
 
     public NewUserWindowViewModel(IUserService userService)
     {
@@ -92,25 +92,7 @@ public class NewUserWindowViewModel : ViewModelBase
     /// </summary>
     private void OnBrowseImage()
     {
-        try
-        {
-            var dialog = new Microsoft.Win32.OpenFileDialog
-            {
-                Title = "Select Avatar Image",
-                Filter = "Image Files (*.jpg;*.jpeg;*.png;*.gif)|*.jpg;*.jpeg;*.png;*.gif",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                SetImagePath(dialog.FileName);
-            }
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Error browsing: {ex.Message}";
-            System.Diagnostics.Debug.WriteLine($"BrowseImage Error: {ex}");
-        }
+        BrowseImageRequested?.Invoke();
     }
 
     private void UpdateCreateCommandState()

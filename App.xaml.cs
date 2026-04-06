@@ -2,6 +2,7 @@ using System;
 using HangmanWpf.Services;
 using HangmanWpf.Services.Interfaces;
 using HangmanWpf.ViewModels;
+using HangmanWpf.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 
@@ -39,6 +40,8 @@ public partial class App : Application
         // WordService and ThemeService are independent
         services.AddSingleton<IWordService, WordService>();
         services.AddSingleton<IThemeService, ThemeService>();
+        services.AddSingleton<IGameDialogService, GameDialogService>();
+        services.AddSingleton<IUiDispatcher, UiDispatcher>();
 
         // GameService depends on WordService
         services.AddSingleton<IGameService, GameService>();

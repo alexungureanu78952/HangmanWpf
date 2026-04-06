@@ -87,7 +87,7 @@ public class UserService : IUserService
     public async Task<List<User>> GetAllUsersAsync()
     {
         var filePath = PathHelpers.GetRelativePath(UsersFilePath);
-        
+
         try
         {
             if (!File.Exists(filePath))
@@ -162,7 +162,7 @@ public class UserService : IUserService
     {
         var filePath = PathHelpers.GetRelativePath(UsersFilePath);
         var json = JsonConvert.SerializeObject(users, Formatting.Indented);
-        
+
         var directory = Path.GetDirectoryName(filePath);
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             Directory.CreateDirectory(directory);
