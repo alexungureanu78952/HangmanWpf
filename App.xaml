@@ -1,8 +1,11 @@
 <Application x:Class="HangmanWpf.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:HangmanWpf.Views.Converters"
              StartupUri="Views/LoginWindow.xaml">
     <Application.Resources>
+        <converters:ImagePathConverter x:Key="ImagePathConverter"/>
+
         <!-- Default theme colors (will be overridden by ThemeService at startup) -->
         <!-- These DynamicResources are defined here so they're accessible throughout the app -->
         <!-- Colors are loaded from theme JSON files in Resources/Themes/ -->

@@ -5,9 +5,7 @@ using System.Windows.Input;
 
 namespace HangmanWpf.Views
 {
-    /// <summary>
-    /// Interaction logic for GameWindow.xaml
-    /// </summary>
+
     public partial class GameWindow : Window
     {
         private GameWindowViewModel? _gameVm;
@@ -16,17 +14,16 @@ namespace HangmanWpf.Views
         {
             InitializeComponent();
 
-            // Set DataContext to GameWindowViewModel from DI container
+
             _gameVm = App.ServiceProvider.GetRequiredService<GameWindowViewModel>();
             DataContext = _gameVm;
 
-            // Subscribe to close events
+
             if (_gameVm != null)
             {
                 _gameVm.GameClosed += OnGameClosed;
             }
 
-            // Subscribe to keyboard input
             this.PreviewKeyDown += GameWindow_PreviewKeyDown;
         }
 
@@ -40,7 +37,6 @@ namespace HangmanWpf.Views
                 return;
             }
 
-            // Support menu actions from keyboard while keeping MVVM command execution.
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
             {
                 if (e.Key == Key.N)
@@ -99,21 +95,17 @@ namespace HangmanWpf.Views
                 return;
             }
 
-            // Handle A-Z key presses.
             if (e.Key >= Key.A && e.Key <= Key.Z)
             {
                 char letter = (char)('A' + (e.Key - Key.A));
                 if (_gameVm?.GuessLetterCommand.CanExecute(letter) == true)
                 {
                     _gameVm.GuessLetterCommand.Execute(letter);
-                    e.Handled = true; // Mark event as handled
+                    e.Handled = true;
                 }
             }
         }
 
-        /// <summary>
-        /// Handle game window closing
-        /// </summary>
         private void OnGameClosed()
         {
             this.Close();
@@ -123,7 +115,6 @@ namespace HangmanWpf.Views
         {
             base.OnClosed(e);
 
-            // Unsubscribe from events to prevent memory leaks
             if (_gameVm != null)
             {
                 _gameVm.GameClosed -= OnGameClosed;

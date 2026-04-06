@@ -8,98 +8,83 @@
         Foreground="{DynamicResource Foreground}"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
-    <StackPanel VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            Margin="30">
-        <!-- Title -->
-        <TextBlock Text="Hangman Game"
-                   FontSize="28"
-                FontWeight="Bold"
-                   Foreground="{DynamicResource Accent}"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,20"/>
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Margin="30">
+                <!-- Title -->
+                <TextBlock Text="Hangman Game"
+                           FontSize="28"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource Accent}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"/>
 
-        <!-- Divider -->
-        <Border BorderBrush="{DynamicResource Border}"
-                BorderThickness="0,1,0,0"
-                Margin="0,0,0,20"/>
+                <!-- Divider -->
+                <Border BorderBrush="{DynamicResource Border}"
+                        BorderThickness="0,1,0,0"
+                        Margin="0,0,0,20"/>
 
-        <!-- Student Info -->
-        <Grid Margin="0,0,0,15">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                <!-- Student Info -->
+                <Grid Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-            <!-- Student Name -->
-            <TextBlock Grid.Row="0"
-                    Grid.Column="0"
-                    Text="Student:"
-                    FontWeight="Bold"
-                    Margin="0,0,20,5"/>
-            <TextBlock Grid.Row="0"
-                    Grid.Column="1"
-                    Text="{Binding StudentName}"
-                    Margin="0,0,0,5"/>
+                        <!-- Student Name -->
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="Student:"
+                                   FontWeight="Bold"
+                                   Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="1"
+                                   Text="{Binding StudentName}"
+                                   Margin="0,0,0,5"/>
 
-            <!-- Group -->
-            <TextBlock Grid.Row="1"
-                    Grid.Column="0"
-                    Text="Group:"
-                    FontWeight="Bold"
-                    Margin="0,0,20,5"/>
-            <TextBlock Grid.Row="1"
-                    Grid.Column="1"
-                    Text="{Binding GroupNumber}"
-                    Margin="0,0,0,5"/>
+                        <!-- Group -->
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   Text="Group:"
+                                   FontWeight="Bold"
+                                   Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Text="{Binding GroupNumber}"
+                                   Margin="0,0,0,5"/>
 
-            <!-- Specialization -->
-            <TextBlock Grid.Row="2"
-                    Grid.Column="0"
-                    Text="Specialization:"
-                    FontWeight="Bold"
-                    Margin="0,0,20,5"/>
-            <TextBlock Grid.Row="2"
-                    Grid.Column="1"
-                    Text="{Binding Specialization}"
-                    Margin="0,0,0,5"/>
+                        <!-- Specialization -->
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="0"
+                                   Text="Specialization:"
+                                   FontWeight="Bold"
+                                   Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="1"
+                                   Text="{Binding Specialization}"
+                                   Margin="0,0,0,5"/>
 
-            <!-- Version -->
-            <TextBlock Grid.Row="3"
-                    Grid.Column="0"
-                    Text="Version:"
-                    FontWeight="Bold"
-                    Margin="0,0,20,0"/>
-            <TextBlock Grid.Row="3"
-                    Grid.Column="1"
-                    Text="{Binding ApplicationVersion}"/>
-        </Grid>
+                </Grid>
 
-        <!-- Divider -->
-        <Border BorderBrush="{DynamicResource Border}"
-                BorderThickness="0,1,0,0"
-                Margin="0,20,0,20"/>
+                <!-- Divider -->
+                <Border BorderBrush="{DynamicResource Border}"
+                        BorderThickness="0,1,0,0"
+                        Margin="0,20,0,20"/>
 
-        <!-- Description -->
-        <TextBlock Text="A classic Hangman word guessing game with themes, statistics, and save/load functionality."
-                   TextWrapping="Wrap"
-                   Foreground="{DynamicResource Foreground}"
-                   Margin="0,0,0,20"
-                   FontSize="11"/>
 
-        <!-- OK Button -->
-        <Button Content="OK"
-                Command="{Binding CloseCommand}"
-                Background="{DynamicResource Success}"
-                Foreground="{DynamicResource Foreground}"
-                Width="100"
-                Height="35"
-                HorizontalAlignment="Center"/>
-    </StackPanel>
+                <!-- OK Button -->
+                <Button Content="OK"
+                        Command="{Binding CloseCommand}"
+                        Background="{DynamicResource Success}"
+                        Foreground="{DynamicResource Foreground}"
+                        Width="100"
+                        Height="35"
+                        HorizontalAlignment="Center"/>
+        </StackPanel>
 </Window>

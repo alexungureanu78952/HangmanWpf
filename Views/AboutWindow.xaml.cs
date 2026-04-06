@@ -13,7 +13,7 @@ namespace HangmanWpf.Views
         {
             InitializeComponent();
 
-            // Set DataContext to AboutWindowViewModel from DI container
+
             var viewModel = App.ServiceProvider.GetRequiredService<AboutWindowViewModel>();
             DataContext = viewModel;
             DataContextChanged += OnDataContextChanged;

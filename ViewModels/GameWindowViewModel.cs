@@ -9,10 +9,7 @@ using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
 
-/// <summary>
-/// ViewModel for GameWindow
-/// Manages game state, guessing, timer, save/load operations
-/// </summary>
+
 public class GameWindowViewModel : ViewModelBase
 {
     private readonly IGameService _gameService;
@@ -198,17 +195,12 @@ public class GameWindowViewModel : ViewModelBase
         InitializeLetterTiles();
     }
 
-    /// <summary>
-    /// Initialize ViewModel with current user
-    /// </summary>
+
     public void Initialize(User user)
     {
         CurrentUser = user;
     }
 
-    /// <summary>
-    /// Load available word categories
-    /// </summary>
     private async System.Threading.Tasks.Task LoadCategoriesAsync()
     {
         try
@@ -224,9 +216,7 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Start a new game
-    /// </summary>
+
     private async System.Threading.Tasks.Task StartNewGameAsync()
     {
         try
@@ -260,9 +250,7 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Handle letter guess
-    /// </summary>
+
     private async void GuessLetter(object? parameter)
     {
         if (parameter == null || !GameInProgress)
@@ -274,7 +262,7 @@ public class GameWindowViewModel : ViewModelBase
 
         char letter = char.ToUpper(paramStr[0]);
 
-        // Check if already guessed
+
         if (_gameService.HasGuessedLetter(letter))
         {
             StatusMessage = $"'{letter}' already guessed!";
@@ -296,7 +284,7 @@ public class GameWindowViewModel : ViewModelBase
             else
                 StatusMessage = $"'{letter}' is wrong!";
 
-            // Check win/loss conditions
+
             if (_gameService.IsWordLost())
             {
                 _gameService.StopTimer();
@@ -317,9 +305,6 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Handle word loss
-    /// </summary>
     private async System.Threading.Tasks.Task HandleWordLoss()
     {
         _gameService.ResetLevel();
@@ -328,9 +313,6 @@ public class GameWindowViewModel : ViewModelBase
         StatusMessage = $"Game Over! Word was: {_gameService.GetCurrentSession().Word}. Level reset to 0.";
     }
 
-    /// <summary>
-    /// Handle word win
-    /// </summary>
     private async System.Threading.Tasks.Task HandleWordWin()
     {
         _gameService.IncrementLevel();
@@ -352,12 +334,10 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Handle timer timeout
-    /// </summary>
+
     private void OnTimeout()
     {
-        // Ignore stale callbacks from a previous round.
+
         if (!GameInProgress || _gameService.GetTimeRemaining() > 0)
         {
             return;
@@ -367,9 +347,6 @@ public class GameWindowViewModel : ViewModelBase
         _ = HandleWordLoss();
     }
 
-    /// <summary>
-    /// Save current game
-    /// </summary>
     private async System.Threading.Tasks.Task SaveGameAsync()
     {
         if (!GameInProgress)
@@ -419,9 +396,6 @@ public class GameWindowViewModel : ViewModelBase
         return _aboutDialogService.ShowAsync();
     }
 
-    /// <summary>
-    /// Restore a selected saved game.
-    /// </summary>
     public async System.Threading.Tasks.Task RestoreSavedGameAsync(SavedGame loadedGame)
     {
         if (loadedGame == null)
@@ -478,9 +452,6 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Change theme
-    /// </summary>
     private async System.Threading.Tasks.Task ChangeThemeAsync(string? themeName)
     {
         if (string.IsNullOrWhiteSpace(themeName))
@@ -500,18 +471,12 @@ public class GameWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Handle cancel/close window
-    /// </summary>
     private void OnCancel()
     {
         _gameService.StopTimer();
         GameClosed?.Invoke();
     }
 
-    /// <summary>
-    /// Change category and reset game state
-    /// </summary>
     private void OnChangeCategory(object? parameter)
     {
         if (parameter == null)
@@ -523,13 +488,11 @@ public class GameWindowViewModel : ViewModelBase
             Category = category;
             StatusMessage = $"Category changed to: {category}. Start a new game!";
 
-            // Stop current game if in progress
             if (GameInProgress)
             {
                 _gameService.StopTimer();
             }
 
-            // Reset game state
             _gameService.ResetLevel();
             GameInProgress = false;
             WordComplete = false;

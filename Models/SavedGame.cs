@@ -9,24 +9,16 @@ namespace HangmanWpf.Models;
 /// </summary>
 public class SavedGame : GameSession
 {
-    /// <summary>
-    /// Unique identifier for this saved game
-    /// </summary>
+
     public Guid SavedGameId { get; set; }
 
-    /// <summary>
-    /// User who saved this game
-    /// </summary>
+
     public Guid UserId { get; set; }
 
-    /// <summary>
-    /// Display name for the saved game (chosen by user when saving)
-    /// </summary>
+
     public string SaveName { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Timestamp when game was saved
-    /// </summary>
+
     public DateTime SavedAt { get; set; }
 
     public SavedGame() : base()
@@ -35,9 +27,7 @@ public class SavedGame : GameSession
         SavedAt = DateTime.UtcNow;
     }
 
-    /// <summary>
-    /// Create SavedGame from current GameSession
-    /// </summary>
+
     public static SavedGame FromGameSession(GameSession session, Guid userId, string saveName)
     {
         return new SavedGame
@@ -54,9 +44,7 @@ public class SavedGame : GameSession
         };
     }
 
-    /// <summary>
-    /// Restore GameSession from SavedGame
-    /// </summary>
+
     public GameSession ToGameSession()
     {
         return new GameSession

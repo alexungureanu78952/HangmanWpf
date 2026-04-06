@@ -8,10 +8,6 @@ using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
 
-/// <summary>
-/// ViewModel for StatisticsWindow
-/// Displays game statistics for all users
-/// </summary>
 public class StatisticsWindowViewModel : ViewModelBase
 {
     private readonly IStatisticsService _statisticsService;
@@ -59,9 +55,6 @@ public class StatisticsWindowViewModel : ViewModelBase
         _ = LoadStatisticsAsync();
     }
 
-    /// <summary>
-    /// Load all statistics from persistence
-    /// </summary>
     private async System.Threading.Tasks.Task LoadStatisticsAsync()
     {
         IsLoading = true;
@@ -108,9 +101,6 @@ public class StatisticsWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Handle close
-    /// </summary>
     private void OnClose()
     {
         _statisticsService.StatisticsChanged -= OnStatisticsChanged;
@@ -129,9 +119,6 @@ public class StatisticsWindowViewModel : ViewModelBase
     }
 }
 
-/// <summary>
-/// One display row in statistics grid: User + Category totals.
-/// </summary>
 public class StatisticsRow
 {
     public string Username { get; set; } = string.Empty;

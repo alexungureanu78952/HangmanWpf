@@ -82,7 +82,7 @@
                                            FontWeight="Bold"
                                            Foreground="{DynamicResource Accent}"
                                            Margin="0,0,0,10"/>
-                                <Image Source="{Binding CurrentUser.ImagePath}"
+                                <Image Source="{Binding CurrentUser.ImagePath, Converter={StaticResource ImagePathConverter}}"
                                        Width="80"
                                        Height="80"
                                        Margin="0,0,0,20"/>

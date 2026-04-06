@@ -6,10 +6,6 @@ using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
 
-/// <summary>
-/// ViewModel for NewUserWindow
-/// Manages user creation
-/// </summary>
 public class NewUserWindowViewModel : ViewModelBase
 {
     private readonly IUserService _userService;
@@ -77,9 +73,6 @@ public class NewUserWindowViewModel : ViewModelBase
         UpdateCreateCommandState();
     }
 
-    /// <summary>
-    /// Set image path (called from View code-behind after dialog)
-    /// </summary>
     public void SetImagePath(string imagePath)
     {
         ImagePath = imagePath;
@@ -87,9 +80,6 @@ public class NewUserWindowViewModel : ViewModelBase
         UpdateCreateCommandState();
     }
 
-    /// <summary>
-    /// Browse for image file
-    /// </summary>
     private void OnBrowseImage()
     {
         BrowseImageRequested?.Invoke();
@@ -103,9 +93,6 @@ public class NewUserWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Create new user
-    /// </summary>
     private async System.Threading.Tasks.Task CreateUserAsync()
     {
         if (string.IsNullOrWhiteSpace(Username))
@@ -138,9 +125,6 @@ public class NewUserWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Handle cancel
-    /// </summary>
     private void OnCancel()
     {
         CancellationRequested?.Invoke();

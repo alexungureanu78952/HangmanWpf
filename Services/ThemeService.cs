@@ -12,19 +12,13 @@ using System.Windows.Media;
 
 namespace HangmanWpf.Services;
 
-/// <summary>
-/// Service for managing dynamic theme switching at runtime
-/// Loads theme definitions from JSON and applies colors to Application.Resources
-/// Enables theme switching without recompilation
-/// </summary>
+
 public class ThemeService : IThemeService
 {
     private const string ThemesBasePath = "Resources/Themes";
     private string _currentTheme = "DarkPurple"; // Default theme
 
-    /// <summary>
-    /// Apply a theme by name (loads JSON and applies to Application.Resources)
-    /// </summary>
+
     public async Task ApplyThemeAsync(string themeName)
     {
         if (string.IsNullOrWhiteSpace(themeName))
@@ -50,7 +44,7 @@ public class ThemeService : IThemeService
                 try
                 {
                     var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colorEntry.Value));
-                    brush.Freeze(); // Freeze for better performance
+                    brush.Freeze();
                     Application.Current.Resources[colorEntry.Key] = brush;
                 }
                 catch (Exception colorEx)
@@ -69,9 +63,7 @@ public class ThemeService : IThemeService
         }
     }
 
-    /// <summary>
-    /// Get list of available themes (by scanning theme files)
-    /// </summary>
+
     public async Task<List<string>> GetAvailableThemesAsync()
     {
         var themesPath = PathHelpers.GetRelativePath(ThemesBasePath);
@@ -112,17 +104,13 @@ public class ThemeService : IThemeService
         }
     }
 
-    /// <summary>
-    /// Get the currently applied theme name
-    /// </summary>
+
     public string GetCurrentTheme()
     {
         return _currentTheme;
     }
 
-    /// <summary>
-    /// Internal: Get full path to theme file
-    /// </summary>
+
     private string GetThemeFilePath(string themeName)
     {
         var themesPath = PathHelpers.GetRelativePath(ThemesBasePath);

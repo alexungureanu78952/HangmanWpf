@@ -7,10 +7,6 @@ using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
 
-/// <summary>
-/// ViewModel for SaveLoadDialog
-/// Manages saving and loading game sessions
-/// </summary>
 public class SaveLoadDialogViewModel : ViewModelBase
 {
     private readonly IGamePersistenceService _persistenceService;
@@ -64,18 +60,12 @@ public class SaveLoadDialogViewModel : ViewModelBase
         CancelCommand = new RelayCommand(_ => OnCancel());
     }
 
-    /// <summary>
-    /// Initialize with user ID
-    /// </summary>
     public void Initialize(Guid userId)
     {
         _userId = userId;
         _ = LoadSavedGamesAsync();
     }
 
-    /// <summary>
-    /// Load all saved games for the user
-    /// </summary>
     private async System.Threading.Tasks.Task LoadSavedGamesAsync()
     {
         if (_userId == Guid.Empty)
@@ -98,9 +88,6 @@ public class SaveLoadDialogViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Load the selected game
-    /// </summary>
     private void OnLoadGame()
     {
         if (SelectedGame != null)
@@ -109,9 +96,6 @@ public class SaveLoadDialogViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Delete the selected game
-    /// </summary>
     private async void OnDeleteGame()
     {
         if (SelectedGame == null)
@@ -128,9 +112,6 @@ public class SaveLoadDialogViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Handle cancel
-    /// </summary>
     private void OnCancel()
     {
         CancellationRequested?.Invoke();

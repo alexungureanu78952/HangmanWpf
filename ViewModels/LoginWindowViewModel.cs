@@ -8,10 +8,6 @@ using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
 
-/// <summary>
-/// ViewModel for LoginWindow
-/// Manages user selection, creation, and deletion
-/// </summary>
 public class LoginWindowViewModel : ViewModelBase
 {
     private readonly IUserService _userService;
@@ -47,14 +43,8 @@ public class LoginWindowViewModel : ViewModelBase
     public ICommand DeleteUserCommand { get; }
     public ICommand CreateUserCommand { get; }
 
-    /// <summary>
-    /// Event fired when user selects a user and clicks Play
-    /// </summary>
     public event Action<User>? UserSelected;
 
-    /// <summary>
-    /// Event fired when user wants to create a new user
-    /// </summary>
     public event Action? NewUserRequested;
 
     public LoginWindowViewModel(IUserService userService)
@@ -69,13 +59,9 @@ public class LoginWindowViewModel : ViewModelBase
         DeleteUserCommand = new RelayCommand(_ => OnDeleteUser(), _ => SelectedUser != null);
         CreateUserCommand = new RelayCommand(_ => OnCreateUser());
 
-        // Load users on ViewModel creation
         _ = LoadUsersAsync();
     }
 
-    /// <summary>
-    /// Load all users from persistence
-    /// </summary>
     private async System.Threading.Tasks.Task LoadUsersAsync()
     {
         IsLoading = true;

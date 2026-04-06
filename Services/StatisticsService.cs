@@ -10,28 +10,21 @@ using System.Threading.Tasks;
 
 namespace HangmanWpf.Services;
 
-/// <summary>
-/// Service for managing game statistics persistence (statistics.json)
-/// </summary>
+
 public class StatisticsService : IStatisticsService
 {
     private const string StatisticsFilePath = "Resources/Data/statistics.json";
 
     public event Action? StatisticsChanged;
 
-    /// <summary>
-    /// Get statistics for a specific user
-    /// </summary>
+
     public async Task<Statistics?> GetStatisticsAsync(Guid userId)
     {
         var allStats = await GetAllStatisticsAsync();
         return allStats.FirstOrDefault(s => s.UserId == userId);
     }
 
-    /// <summary>
-    /// Update statistics after game completes (win or loss)
-    /// Creates user stats if doesn't exist
-    /// </summary>
+
     public async Task UpdateStatisticsAsync(Guid userId, string username, string category, bool isWon)
     {
         var allStats = await GetAllStatisticsAsync();
@@ -43,7 +36,7 @@ public class StatisticsService : IStatisticsService
             allStats.Add(userStats);
         }
 
-        // Update category stats
+
         userStats.IncrementGamesPlayed(category);
         if (isWon)
             userStats.IncrementGamesWon(category);
@@ -52,9 +45,7 @@ public class StatisticsService : IStatisticsService
         StatisticsChanged?.Invoke();
     }
 
-    /// <summary>
-    /// Get all statistics for all users
-    /// </summary>
+
     public async Task<List<Statistics>> GetAllStatisticsAsync()
     {
         var filePath = PathHelpers.GetRelativePath(StatisticsFilePath);
@@ -82,9 +73,7 @@ public class StatisticsService : IStatisticsService
         }
     }
 
-    /// <summary>
-    /// Delete all statistics for a user (cascade on user deletion)
-    /// </summary>
+
     public async Task DeleteUserStatisticsAsync(Guid userId)
     {
         var allStats = await GetAllStatisticsAsync();
@@ -98,9 +87,7 @@ public class StatisticsService : IStatisticsService
         }
     }
 
-    /// <summary>
-    /// Internal: Save statistics to JSON
-    /// </summary>
+
     private async Task SaveStatisticsAsync(List<Statistics> statistics)
     {
         var filePath = PathHelpers.GetRelativePath(StatisticsFilePath);

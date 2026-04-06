@@ -9,18 +9,12 @@ using System.Threading.Tasks;
 
 namespace HangmanWpf.Services;
 
-/// <summary>
-/// Service for loading word lists by category
-/// Reads from Resources/Words/AllCategories.json
-/// </summary>
+
 public class WordService : IWordService
 {
     private const string WordsFilePath = "Resources/Words/AllCategories.json";
     private Dictionary<string, List<string>>? _wordCache;
 
-    /// <summary>
-    /// Get all words for a specific category
-    /// </summary>
     public async Task<List<string>> GetWordsByCategoryAsync(string category)
     {
         var allWords = await LoadAllWordsAsync();
@@ -40,9 +34,7 @@ public class WordService : IWordService
         return new List<string>();
     }
 
-    /// <summary>
-    /// Get list of all available categories
-    /// </summary>
+
     public async Task<List<string>> GetAllCategoriesAsync()
     {
         var allWords = await LoadAllWordsAsync();
@@ -56,9 +48,7 @@ public class WordService : IWordService
         return categories;
     }
 
-    /// <summary>
-    /// Get a random word from the specified category
-    /// </summary>
+
     public async Task<string> GetRandomWordAsync(string category)
     {
         var words = await GetWordsByCategoryAsync(category);
@@ -71,12 +61,9 @@ public class WordService : IWordService
         return words[randomIndex].ToUpper();
     }
 
-    /// <summary>
-    /// Internal: Load all words from JSON (cached)
-    /// </summary>
     private async Task<Dictionary<string, List<string>>> LoadAllWordsAsync()
     {
-        // Return cached data if available
+
         if (_wordCache != null)
             return _wordCache;
 
@@ -103,9 +90,7 @@ public class WordService : IWordService
         }
     }
 
-    /// <summary>
-    /// Clear word cache (useful for testing)
-    /// </summary>
+
     public void ClearCache()
     {
         _wordCache = null;

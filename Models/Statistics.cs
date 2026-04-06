@@ -41,19 +41,13 @@ public class CategoryStats
 /// </summary>
 public class Statistics
 {
-    /// <summary>
-    /// User ID these statistics belong to
-    /// </summary>
+
     public Guid UserId { get; set; }
 
-    /// <summary>
-    /// Username for display purposes
-    /// </summary>
+
     public string Username { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Statistics per category
-    /// </summary>
+
     public List<CategoryStats> CategoryStats { get; set; } = new();
 
     public Statistics()
@@ -66,9 +60,7 @@ public class Statistics
         Username = username;
     }
 
-    /// <summary>
-    /// Get or create stats for a category
-    /// </summary>
+
     public CategoryStats GetOrCreateCategory(string category)
     {
         var existing = CategoryStats.FirstOrDefault(c => c.Category == category);
@@ -80,17 +72,13 @@ public class Statistics
         return newCategory;
     }
 
-    /// <summary>
-    /// Increment games played for a category
-    /// </summary>
+
     public void IncrementGamesPlayed(string category)
     {
         GetOrCreateCategory(category).GamesPlayed++;
     }
 
-    /// <summary>
-    /// Increment games won for a category
-    /// </summary>
+
     public void IncrementGamesWon(string category)
     {
         GetOrCreateCategory(category).GamesWon++;

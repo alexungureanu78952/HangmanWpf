@@ -10,19 +10,13 @@ namespace HangmanWpf.Models;
 /// </summary>
 public class GameSession
 {
-    /// <summary>
-    /// The word to guess (uppercase)
-    /// </summary>
+
     public string Word { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Category of the current word (e.g., "Movies", "Cars")
-    /// </summary>
+
     public string Category { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Letters that have been guessed so far
-    /// </summary>
+
     public List<char> GuessedLetters { get; set; } = new();
 
     /// <summary>
@@ -45,9 +39,7 @@ public class GameSession
     /// </summary>
     public int TimeRemaining { get; set; } = 30;
 
-    /// <summary>
-    /// Timestamp when game session started
-    /// </summary>
+
     public DateTime StartedAt { get; set; }
 
     public GameSession()
@@ -55,26 +47,20 @@ public class GameSession
         StartedAt = DateTime.UtcNow;
     }
 
-    /// <summary>
-    /// Returns the display state of the word (e.g., "W_RD" for "WORD" with only W and D guessed)
-    /// </summary>
+
     public string GetWordDisplay()
     {
-        return string.Concat(Word.Select(letter => 
+        return string.Concat(Word.Select(letter =>
             GuessedLetters.Contains(letter) ? letter : '_'));
     }
 
-    /// <summary>
-    /// Checks if letter has already been guessed
-    /// </summary>
+
     public bool HasGuessedLetter(char letter)
     {
         return GuessedLetters.Contains(char.ToUpper(letter));
     }
 
-    /// <summary>
-    /// Checks if the word is completely guessed
-    /// </summary>
+
     public bool IsWordComplete()
     {
         return Word.All(letter => GuessedLetters.Contains(letter));

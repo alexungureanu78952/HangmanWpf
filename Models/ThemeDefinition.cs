@@ -11,9 +11,7 @@ namespace HangmanWpf.Models;
 /// </summary>
 public class ThemeDefinition
 {
-    /// <summary>
-    /// Theme name (e.g., "DarkPurple", "DarkRed")
-    /// </summary>
+
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
@@ -23,6 +21,5 @@ public class ThemeDefinition
     /// and referenced via {DynamicResource PrimaryBackground} in XAML
     /// </summary>
     public Dictionary<string, string> Colors { get; set; } = new();
-
 
 }

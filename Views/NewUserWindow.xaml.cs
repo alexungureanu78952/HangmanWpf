@@ -6,9 +6,6 @@ using System.Windows;
 
 namespace HangmanWpf.Views
 {
-    /// <summary>
-    /// Interaction logic for NewUserWindow.xaml
-    /// </summary>
     public partial class NewUserWindow : Window
     {
         private readonly NewUserWindowViewModel _viewModel;
@@ -17,7 +14,6 @@ namespace HangmanWpf.Views
         {
             InitializeComponent();
 
-            // Set DataContext to NewUserWindowViewModel from DI container
             _viewModel = App.ServiceProvider.GetRequiredService<NewUserWindowViewModel>();
             DataContext = _viewModel;
 

@@ -6,10 +6,7 @@ using System.Timers;
 
 namespace HangmanWpf.Services;
 
-/// <summary>
-/// Service for managing core hangman game logic
-/// Handles word guessing, level tracking, timer, and win/loss conditions
-/// </summary>
+
 public class GameService : IGameService
 {
     private GameSession _currentSession;
@@ -105,9 +102,7 @@ public class GameService : IGameService
         _activeTimerId = 0;
     }
 
-    /// <summary>
-    /// Start a new game with a word from the specified category
-    /// </summary>
+
     public async Task StartGameAsync(string category)
     {
         if (string.IsNullOrWhiteSpace(category))
@@ -130,22 +125,19 @@ public class GameService : IGameService
         StopTimer();
     }
 
-    /// <summary>
-    /// Make a guess (letter A-Z)
-    /// Returns true if letter is in the word, false if wrong guess
-    /// </summary>
+
     public async Task<bool> GuessLetterAsync(char letter)
     {
         letter = char.ToUpper(letter);
 
-        // Check if already guessed
-        if (_currentSession.HasGuessedLetter(letter))
-            return false; // Already guessed, invalid move
 
-        // Add letter to guessed list
+        if (_currentSession.HasGuessedLetter(letter))
+            return false;
+
+
         _currentSession.GuessedLetters.Add(letter);
 
-        // Check if letter is in word
+
         bool isCorrect = _currentSession.Word.Contains(letter);
 
         if (!isCorrect)
@@ -157,82 +149,62 @@ public class GameService : IGameService
         return isCorrect;
     }
 
-    /// <summary>
-    /// Check if the current word is completely guessed
-    /// </summary>
+
     public bool IsWordComplete()
     {
         return _currentSession.IsWordComplete();
     }
 
-    /// <summary>
-    /// Check if the current word is lost (6 wrong guesses or timeout)
-    /// </summary>
+
     public bool IsWordLost()
     {
         return _currentSession.WrongCount >= 6 || _currentSession.TimeRemaining <= 0;
     }
 
-    /// <summary>
-    /// Check if the entire game is won (3 consecutive words guessed)
-    /// </summary>
+
     public bool IsGameWon()
     {
         return _currentSession.Level >= 3;
     }
 
-    /// <summary>
-    /// Get current game session state
-    /// </summary>
+
     public GameSession GetCurrentSession()
     {
         return _currentSession;
     }
 
-    /// <summary>
-    /// Get current level (0-3)
-    /// </summary>
+
     public int GetCurrentLevel()
     {
         return _currentSession.Level;
     }
 
-    /// <summary>
-    /// Increment level when word is won
-    /// </summary>
+
     public void IncrementLevel()
     {
         if (_currentSession.Level < 3)
             _currentSession.Level++;
     }
 
-    /// <summary>
-    /// Reset level to 0 when word is lost
-    /// </summary>
+
     public void ResetLevel()
     {
         _currentSession.Level = 0;
     }
 
-    /// <summary>
-    /// Get time remaining in seconds
-    /// </summary>
+
     public int GetTimeRemaining()
     {
         return _currentSession.TimeRemaining;
     }
 
-    /// <summary>
-    /// Update time remaining (called per second from ViewModel)
-    /// </summary>
+
     public void UpdateTimeRemaining(int secondsRemaining)
     {
         _currentSession.TimeRemaining = Math.Max(0, secondsRemaining);
     }
 
-    /// <summary>
-    /// Start the countdown timer (fires every second)
-    /// </summary>
+
     public void StartTimer(Action<int> onTimeUpdate, Action onTimeoutCallback)
     {
         StopTimer();
@@ -244,18 +216,16 @@ public class GameService : IGameService
         _activeTimerId++;
         int timerId = _activeTimerId;
 
-        // Push the initial value so UI is always in sync at timer start.
+
         _onTimeUpdateCallback?.Invoke(_timerStartSeconds);
 
-        _gameTimer = new Timer(1000); // Fire every 1 second
+        _gameTimer = new Timer(1000);
         _gameTimer.Elapsed += (s, e) => OnTimerTick(timerId);
         _gameTimer.AutoReset = true;
         _gameTimer.Start();
     }
 
-    /// <summary>
-    /// Stop the countdown timer
-    /// </summary>
+
     public void StopTimer()
     {
         _activeTimerId++;
@@ -268,58 +238,44 @@ public class GameService : IGameService
         }
     }
 
-    /// <summary>
-    /// Check if letter has already been guessed
-    /// </summary>
+
     public bool HasGuessedLetter(char letter)
     {
         return _currentSession.HasGuessedLetter(letter);
     }
 
-    /// <summary>
-    /// Get the display state of the word (e.g., "W_RD" for "WORD")
-    /// </summary>
+
     public string GetWordDisplay()
     {
         return _currentSession.GetWordDisplay();
     }
 
-    /// <summary>
-    /// Get ASCII hangman display for current stage
-    /// </summary>
+
     public string GetHangmanDisplay()
     {
         int stage = Math.Min(_currentSession.WrongCount, 6);
         return HangmanStages[stage];
     }
 
-    /// <summary>
-    /// Get number of wrong guesses (0-6)
-    /// </summary>
+
     public int GetWrongCount()
     {
         return _currentSession.WrongCount;
     }
 
-    /// <summary>
-    /// Get total number of guessed letters
-    /// </summary>
+
     public int GetGuessedLetterCount()
     {
         return _currentSession.GuessedLetters.Count;
     }
 
-    /// <summary>
-    /// Get current category
-    /// </summary>
+
     public string GetCategory()
     {
         return _currentSession.Category;
     }
 
-    /// <summary>
-    /// Save game session to a SavedGame snapshot
-    /// </summary>
+
     public SavedGame CreateSaveSnapshot(Guid userId, string saveName)
     {
         if (string.IsNullOrWhiteSpace(saveName))
@@ -328,9 +284,7 @@ public class GameService : IGameService
         return SavedGame.FromGameSession(_currentSession, userId, saveName);
     }
 
-    /// <summary>
-    /// Restore game session from a SavedGame
-    /// </summary>
+
     public async Task RestoreFromSaveAsync(SavedGame savedGame)
     {
         if (savedGame == null)
@@ -342,9 +296,7 @@ public class GameService : IGameService
         await Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Internal: Timer tick handler - updates time remaining
-    /// </summary>
+
     private void OnTimerTick(int timerId)
     {
         if (timerId != _activeTimerId)

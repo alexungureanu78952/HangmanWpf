@@ -9,18 +9,11 @@ using System.Threading.Tasks;
 
 namespace HangmanWpf.Services;
 
-/// <summary>
-/// Service for saving and loading game sessions
-/// Stores saved games in: Resources/Data/SavedGames/{UserId}/{GameId}.json
-/// </summary>
+
 public class GamePersistenceService : IGamePersistenceService
 {
     private const string SavedGamesBasePath = "Resources/Data/SavedGames";
 
-    /// <summary>
-    /// Save a game session to disk
-    /// Creates directory structure if needed: SavedGames/{UserId}/
-    /// </summary>
     public async Task SaveGameAsync(SavedGame savedGame)
     {
         if (savedGame == null)
@@ -36,9 +29,7 @@ public class GamePersistenceService : IGamePersistenceService
         await File.WriteAllTextAsync(filePath, json);
     }
 
-    /// <summary>
-    /// Load a saved game by ID
-    /// </summary>
+
     public async Task<SavedGame?> LoadGameAsync(Guid userId, Guid gameId)
     {
         var userPath = GetUserSavePath(userId);
@@ -60,9 +51,7 @@ public class GamePersistenceService : IGamePersistenceService
         }
     }
 
-    /// <summary>
-    /// Get all saved games for a user
-    /// </summary>
+
     public async Task<List<SavedGame>> GetSavedGamesAsync(Guid userId)
     {
         var userPath = GetUserSavePath(userId);
@@ -91,9 +80,7 @@ public class GamePersistenceService : IGamePersistenceService
         return savedGames;
     }
 
-    /// <summary>
-    /// Delete a specific saved game
-    /// </summary>
+
     public async Task DeleteSavedGameAsync(Guid userId, Guid gameId)
     {
         var userPath = GetUserSavePath(userId);
@@ -106,9 +93,7 @@ public class GamePersistenceService : IGamePersistenceService
         }
     }
 
-    /// <summary>
-    /// Delete all saved games for a user (cascade on user deletion)
-    /// </summary>
+
     public async Task DeleteAllUserGamesAsync(Guid userId)
     {
         var userPath = GetUserSavePath(userId);
@@ -128,9 +113,7 @@ public class GamePersistenceService : IGamePersistenceService
         await Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Internal: Get the directory path for a user's saved games
-    /// </summary>
+
     private string GetUserSavePath(Guid userId)
     {
         var basePath = PathHelpers.GetRelativePath(SavedGamesBasePath);
