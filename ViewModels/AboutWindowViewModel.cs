@@ -10,9 +10,9 @@ namespace HangmanWpf.ViewModels;
 /// </summary>
 public class AboutWindowViewModel : ViewModelBase
 {
-    public string StudentName => "Student Name";
-    public string GroupNumber => "Group Number";
-    public string Specialization => "Specialization";
+    public string StudentName => "Ungureanu Alexandru-Florin";
+    public string GroupNumber => "10LF244";
+    public string Specialization => "Informatica";
     public string ApplicationVersion => "1.0.0";
 
     public ICommand CloseCommand { get; }

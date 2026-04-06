@@ -22,13 +22,25 @@ public class NewUserWindowViewModel : ViewModelBase
     public string Username
     {
         get => _username;
-        set => SetProperty(ref _username, value);
+        set
+        {
+            if (SetProperty(ref _username, value))
+            {
+                UpdateCreateCommandState();
+            }
+        }
     }
 
     public string ImagePath
     {
         get => _imagePath;
-        set => SetProperty(ref _imagePath, value);
+        set
+        {
+            if (SetProperty(ref _imagePath, value))
+            {
+                UpdateCreateCommandState();
+            }
+        }
     }
 
     public bool IsLoading
@@ -61,6 +73,8 @@ public class NewUserWindowViewModel : ViewModelBase
         BrowseImageCommand = new RelayCommand(_ => OnBrowseImage());
         CreateUserCommand = new AsyncRelayCommand(CreateUserAsync, () => !string.IsNullOrWhiteSpace(Username) && !string.IsNullOrWhiteSpace(ImagePath));
         CancelCommand = new RelayCommand(_ => OnCancel());
+
+        UpdateCreateCommandState();
     }
 
     /// <summary>
@@ -70,6 +84,7 @@ public class NewUserWindowViewModel : ViewModelBase
     {
         ImagePath = imagePath;
         StatusMessage = "Image selected.";
+        UpdateCreateCommandState();
     }
 
     /// <summary>
@@ -96,8 +111,14 @@ public class NewUserWindowViewModel : ViewModelBase
             StatusMessage = $"Error browsing: {ex.Message}";
             System.Diagnostics.Debug.WriteLine($"BrowseImage Error: {ex}");
         }
-        // The BrowseImageCommand.Execute() is called from code-behind with the dialog
-        System.Diagnostics.Debug.WriteLine("Browse image requested - handled in View code-behind");
+    }
+
+    private void UpdateCreateCommandState()
+    {
+        if (CreateUserCommand is AsyncRelayCommand asyncCommand)
+        {
+            asyncCommand.RaiseCanExecuteChanged();
+        }
     }
 
     /// <summary>

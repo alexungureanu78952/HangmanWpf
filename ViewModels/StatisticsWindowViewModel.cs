@@ -3,6 +3,8 @@ using HangmanWpf.Services.Interfaces;
 using HangmanWpf.Utilities;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
@@ -14,13 +16,15 @@ namespace HangmanWpf.ViewModels;
 public class StatisticsWindowViewModel : ViewModelBase
 {
     private readonly IStatisticsService _statisticsService;
-    private ObservableCollection<Statistics> _allStatistics;
+    private readonly IUserService _userService;
+    private readonly IWordService _wordService;
+    private ObservableCollection<StatisticsRow> _statisticsRows;
     private bool _isLoading;
 
-    public ObservableCollection<Statistics> AllStatistics
+    public ObservableCollection<StatisticsRow> StatisticsRows
     {
-        get => _allStatistics;
-        set => SetProperty(ref _allStatistics, value);
+        get => _statisticsRows;
+        set => SetProperty(ref _statisticsRows, value);
     }
 
     public bool IsLoading
@@ -34,14 +38,21 @@ public class StatisticsWindowViewModel : ViewModelBase
 
     public event Action? CloseRequested;
 
-    public StatisticsWindowViewModel(IStatisticsService statisticsService)
+    public StatisticsWindowViewModel(
+        IStatisticsService statisticsService,
+        IUserService userService,
+        IWordService wordService)
     {
         _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
-        _allStatistics = new ObservableCollection<Statistics>();
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _wordService = wordService ?? throw new ArgumentNullException(nameof(wordService));
+        _statisticsRows = new ObservableCollection<StatisticsRow>();
         _isLoading = false;
 
         LoadStatisticsCommand = new AsyncRelayCommand(LoadStatisticsAsync);
         CloseCommand = new RelayCommand(_ => OnClose());
+
+        _statisticsService.StatisticsChanged += OnStatisticsChanged;
 
         _ = LoadStatisticsAsync();
     }
@@ -54,8 +65,36 @@ public class StatisticsWindowViewModel : ViewModelBase
         IsLoading = true;
         try
         {
-            var stats = await _statisticsService.GetAllStatisticsAsync();
-            AllStatistics = new ObservableCollection<Statistics>(stats);
+            var users = await _userService.GetAllUsersAsync();
+            var allStats = await _statisticsService.GetAllStatisticsAsync();
+            var categories = await _wordService.GetAllCategoriesAsync();
+
+            var rows = users
+                .SelectMany(user =>
+                {
+                    var userStats = allStats.FirstOrDefault(s => s.UserId == user.UserId);
+
+                    return categories.Select(category =>
+                    {
+                        var categoryStats = userStats?.CategoryStats.FirstOrDefault(c => c.Category == category);
+                        int played = categoryStats?.GamesPlayed ?? 0;
+                        int won = categoryStats?.GamesWon ?? 0;
+
+                        return new StatisticsRow
+                        {
+                            Username = user.Username,
+                            Category = category,
+                            GamesPlayed = played,
+                            GamesWon = won
+                        };
+                    });
+                })
+                .Where(row => row.GamesPlayed > 0 || row.GamesWon > 0)
+                .OrderBy(r => r.Username)
+                .ThenBy(r => r.Category)
+                .ToList();
+
+            StatisticsRows = new ObservableCollection<StatisticsRow>(rows);
         }
         catch (Exception ex)
         {
@@ -72,6 +111,36 @@ public class StatisticsWindowViewModel : ViewModelBase
     /// </summary>
     private void OnClose()
     {
+        _statisticsService.StatisticsChanged -= OnStatisticsChanged;
         CloseRequested?.Invoke();
     }
+
+    private void OnStatisticsChanged()
+    {
+        if (Application.Current?.Dispatcher == null)
+        {
+            _ = LoadStatisticsAsync();
+            return;
+        }
+
+        if (Application.Current.Dispatcher.CheckAccess())
+        {
+            _ = LoadStatisticsAsync();
+        }
+        else
+        {
+            Application.Current.Dispatcher.InvokeAsync(() => LoadStatisticsAsync());
+        }
+    }
+}
+
+/// <summary>
+/// One display row in statistics grid: User + Category totals.
+/// </summary>
+public class StatisticsRow
+{
+    public string Username { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public int GamesPlayed { get; set; }
+    public int GamesWon { get; set; }
 }

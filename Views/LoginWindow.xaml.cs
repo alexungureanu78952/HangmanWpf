@@ -35,11 +35,20 @@ public partial class LoginWindow : Window
         gameVm.Initialize(selectedUser);
 
         // Create and show GameWindow
-        var gameWindow = new GameWindow();
-        gameWindow.Show();
+        var gameWindow = new GameWindow
+        {
+            Owner = this
+        };
 
-        // Optionally hide login window while playing
-        // this.Hide();
+        gameWindow.Closed += (_, _) =>
+        {
+            Show();
+            Activate();
+            ((LoginWindowViewModel)DataContext).LoadUsersCommand.Execute(null);
+        };
+
+        Hide();
+        gameWindow.Show();
     }
 
     /// <summary>

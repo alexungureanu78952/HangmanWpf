@@ -11,6 +11,12 @@ namespace HangmanWpf.Services.Interfaces;
 public interface IStatisticsService
 {
     /// <summary>
+    /// Raised whenever the statistics store changes.
+    /// UI consumers can reload automatically when this fires.
+    /// </summary>
+    event Action? StatisticsChanged;
+
+    /// <summary>
     /// Get statistics for a specific user
     /// </summary>
     Task<Statistics?> GetStatisticsAsync(Guid userId);

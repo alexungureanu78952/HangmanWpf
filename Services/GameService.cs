@@ -18,6 +18,8 @@ public class GameService : IGameService
     private Action<int>? _onTimeUpdateCallback;
     private Action? _onTimeoutCallback;
     private int _timerElapsedSeconds;
+    private int _timerStartSeconds;
+    private int _activeTimerId;
 
     // ASCII Hangman art stages (0-6 wrong guesses)
     private static readonly string[] HangmanStages = new[]
@@ -99,6 +101,8 @@ public class GameService : IGameService
         _wordService = wordService ?? throw new ArgumentNullException(nameof(wordService));
         _currentSession = new GameSession();
         _timerElapsedSeconds = 0;
+        _timerStartSeconds = 30;
+        _activeTimerId = 0;
     }
 
     /// <summary>
@@ -109,12 +113,14 @@ public class GameService : IGameService
         if (string.IsNullOrWhiteSpace(category))
             throw new ArgumentException("Category cannot be empty", nameof(category));
 
+        int currentLevel = _currentSession.Level;
+
         _currentSession = new GameSession
         {
             Category = category,
             Word = await _wordService.GetRandomWordAsync(category),
             GuessedLetters = new(),
-            Level = 0,
+            Level = currentLevel,
             WrongCount = 0,
             TimeRemaining = 30,
             StartedAt = DateTime.UtcNow
@@ -229,12 +235,20 @@ public class GameService : IGameService
     /// </summary>
     public void StartTimer(Action<int> onTimeUpdate, Action onTimeoutCallback)
     {
+        StopTimer();
+
         _onTimeUpdateCallback = onTimeUpdate;
         _onTimeoutCallback = onTimeoutCallback;
         _timerElapsedSeconds = 0;
+        _timerStartSeconds = Math.Max(1, _currentSession.TimeRemaining);
+        _activeTimerId++;
+        int timerId = _activeTimerId;
+
+        // Push the initial value so UI is always in sync at timer start.
+        _onTimeUpdateCallback?.Invoke(_timerStartSeconds);
 
         _gameTimer = new Timer(1000); // Fire every 1 second
-        _gameTimer.Elapsed += (s, e) => OnTimerTick();
+        _gameTimer.Elapsed += (s, e) => OnTimerTick(timerId);
         _gameTimer.AutoReset = true;
         _gameTimer.Start();
     }
@@ -244,6 +258,8 @@ public class GameService : IGameService
     /// </summary>
     public void StopTimer()
     {
+        _activeTimerId++;
+
         if (_gameTimer != null)
         {
             _gameTimer.Stop();
@@ -309,8 +325,6 @@ public class GameService : IGameService
         if (string.IsNullOrWhiteSpace(saveName))
             throw new ArgumentException("Save name cannot be empty", nameof(saveName));
 
-        StopTimer(); // Stop timer before saving
-
         return SavedGame.FromGameSession(_currentSession, userId, saveName);
     }
 
@@ -331,10 +345,13 @@ public class GameService : IGameService
     /// <summary>
     /// Internal: Timer tick handler - updates time remaining
     /// </summary>
-    private void OnTimerTick()
+    private void OnTimerTick(int timerId)
     {
+        if (timerId != _activeTimerId)
+            return;
+
         _timerElapsedSeconds++;
-        int timeRemaining = 30 - _timerElapsedSeconds;
+        int timeRemaining = _timerStartSeconds - _timerElapsedSeconds;
 
         if (timeRemaining <= 0)
         {

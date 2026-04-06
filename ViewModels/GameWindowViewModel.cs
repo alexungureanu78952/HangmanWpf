@@ -4,6 +4,8 @@ using HangmanWpf.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace HangmanWpf.ViewModels;
@@ -31,6 +33,7 @@ public class GameWindowViewModel : ViewModelBase
     private bool _wordComplete;
     private bool _gameWon;
     private ObservableCollection<string> _categories;
+    private ObservableCollection<LetterTileViewModel> _letterTiles;
     private ObservableCollection<char> _guessedLetters;
     private string _statusMessage;
 
@@ -79,13 +82,25 @@ public class GameWindowViewModel : ViewModelBase
     public bool GameInProgress
     {
         get => _gameInProgress;
-        set => SetProperty(ref _gameInProgress, value);
+        set
+        {
+            if (SetProperty(ref _gameInProgress, value))
+            {
+                RefreshCommandStates();
+            }
+        }
     }
 
     public bool WordComplete
     {
         get => _wordComplete;
-        set => SetProperty(ref _wordComplete, value);
+        set
+        {
+            if (SetProperty(ref _wordComplete, value))
+            {
+                RefreshCommandStates();
+            }
+        }
     }
 
     public bool GameWon
@@ -104,6 +119,12 @@ public class GameWindowViewModel : ViewModelBase
     {
         get => _guessedLetters;
         set => SetProperty(ref _guessedLetters, value);
+    }
+
+    public ObservableCollection<LetterTileViewModel> LetterTiles
+    {
+        get => _letterTiles;
+        set => SetProperty(ref _letterTiles, value);
     }
 
     public string StatusMessage
@@ -146,6 +167,7 @@ public class GameWindowViewModel : ViewModelBase
         _wordComplete = false;
         _gameWon = false;
         _categories = new ObservableCollection<string>();
+        _letterTiles = new ObservableCollection<LetterTileViewModel>();
         _guessedLetters = new ObservableCollection<char>();
         _statusMessage = "Welcome to Hangman!";
 
@@ -158,6 +180,7 @@ public class GameWindowViewModel : ViewModelBase
         CancelCommand = new RelayCommand(_ => OnCancel());
 
         _ = LoadCategoriesAsync();
+        InitializeLetterTiles();
     }
 
     /// <summary>
@@ -198,18 +221,22 @@ public class GameWindowViewModel : ViewModelBase
 
             GameInProgress = true;
             WordComplete = false;
+            GameWon = false;
             WordDisplay = _gameService.GetWordDisplay();
             HangmanDisplay = _gameService.GetHangmanDisplay();
             TimerSeconds = 30;
             Level = _gameService.GetCurrentLevel();
             WrongCount = _gameService.GetWrongCount();
             GuessedLetters.Clear();
+            ResetLetterTiles();
             StatusMessage = "Game started! Guess a letter.";
 
             _gameService.StartTimer(
-                onTimeUpdate: seconds => TimerSeconds = seconds,
-                onTimeoutCallback: OnTimeout
+                onTimeUpdate: seconds => RunOnUiThread(() => TimerSeconds = seconds),
+                onTimeoutCallback: () => RunOnUiThread(OnTimeout)
             );
+
+            RefreshCommandStates();
         }
         catch (Exception ex)
         {
@@ -243,6 +270,7 @@ public class GameWindowViewModel : ViewModelBase
         {
             bool isCorrect = await _gameService.GuessLetterAsync(letter);
             GuessedLetters.Add(letter);
+            UpdateLetterTile(letter, isCorrect);
 
             WordDisplay = _gameService.GetWordDisplay();
             HangmanDisplay = _gameService.GetHangmanDisplay();
@@ -297,11 +325,15 @@ public class GameWindowViewModel : ViewModelBase
         {
             GameWon = true;
             await _statisticsService.UpdateStatisticsAsync(CurrentUser.UserId, CurrentUser.Username, Category, true);
-            StatusMessage = "Congratulations! You won the game!";
+
+
+            _gameService.ResetLevel();
+            Level = _gameService.GetCurrentLevel();
+            StatusMessage = "Congratulations! You won the game! Counter reset to 0. Click New Game.";
         }
         else
         {
-            StatusMessage = $"Word guessed! Level: {Level}/3. Play again?";
+            StatusMessage = $"Word guessed! Level: {Level}/3. Click New Game to continue.";
         }
     }
 
@@ -310,6 +342,12 @@ public class GameWindowViewModel : ViewModelBase
     /// </summary>
     private void OnTimeout()
     {
+        // Ignore stale callbacks from a previous round.
+        if (!GameInProgress || _gameService.GetTimeRemaining() > 0)
+        {
+            return;
+        }
+
         GameInProgress = false;
         _ = HandleWordLoss();
     }
@@ -322,11 +360,18 @@ public class GameWindowViewModel : ViewModelBase
         if (!GameInProgress)
             return;
 
+        if (CurrentUser.UserId == Guid.Empty)
+        {
+            StatusMessage = "Select a valid user before saving.";
+            return;
+        }
+
         try
         {
-            var savedGame = _gameService.CreateSaveSnapshot(CurrentUser.UserId, $"Game_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}");
+            var saveName = $"{Category}_L{Level}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}";
+            var savedGame = _gameService.CreateSaveSnapshot(CurrentUser.UserId, saveName);
             await _persistenceService.SaveGameAsync(savedGame);
-            StatusMessage = "Game saved!";
+            StatusMessage = $"Game saved: {saveName}";
         }
         catch (Exception ex)
         {
@@ -340,6 +385,12 @@ public class GameWindowViewModel : ViewModelBase
     /// </summary>
     private async System.Threading.Tasks.Task LoadGameAsync()
     {
+        if (CurrentUser.UserId == Guid.Empty)
+        {
+            StatusMessage = "Select a valid user before opening a saved game.";
+            return;
+        }
+
         try
         {
             var savedGames = await _persistenceService.GetSavedGamesAsync(CurrentUser.UserId);
@@ -349,32 +400,70 @@ public class GameWindowViewModel : ViewModelBase
                 return;
             }
 
-            // For now, load the first saved game
-            var loadedGame = savedGames[0];
+            // Load the latest save for the current user.
+            var loadedGame = savedGames.OrderByDescending(g => g.SavedAt).First();
             await _gameService.RestoreFromSaveAsync(loadedGame);
 
             GameInProgress = true;
             WordComplete = false;
+            GameWon = false;
             WordDisplay = _gameService.GetWordDisplay();
             HangmanDisplay = _gameService.GetHangmanDisplay();
             TimerSeconds = _gameService.GetTimeRemaining();
             Level = _gameService.GetCurrentLevel();
             WrongCount = _gameService.GetWrongCount();
             GuessedLetters.Clear();
+            ResetLetterTiles();
             foreach (var letter in _gameService.GetCurrentSession().GuessedLetters)
+            {
                 GuessedLetters.Add(letter);
+                UpdateLetterTile(letter, _gameService.GetCurrentSession().Word.Contains(letter));
+            }
 
-            StatusMessage = "Game loaded!";
+            StatusMessage = $"Game loaded: {loadedGame.SaveName}";
 
             _gameService.StartTimer(
-                onTimeUpdate: seconds => TimerSeconds = seconds,
-                onTimeoutCallback: OnTimeout
+                onTimeUpdate: seconds => RunOnUiThread(() => TimerSeconds = seconds),
+                onTimeoutCallback: () => RunOnUiThread(OnTimeout)
             );
+
+            RefreshCommandStates();
         }
         catch (Exception ex)
         {
             StatusMessage = $"Error loading game: {ex.Message}";
             System.Diagnostics.Debug.WriteLine(ex);
+        }
+    }
+
+    private void RefreshCommandStates()
+    {
+        if (SaveGameCommand is AsyncRelayCommand saveCommand)
+        {
+            saveCommand.RaiseCanExecuteChanged();
+        }
+
+        if (GuessLetterCommand is RelayCommand guessCommand)
+        {
+            guessCommand.RaiseCanExecuteChanged();
+        }
+    }
+
+    private static void RunOnUiThread(Action action)
+    {
+        if (Application.Current?.Dispatcher == null)
+        {
+            action();
+            return;
+        }
+
+        if (Application.Current.Dispatcher.CheckAccess())
+        {
+            action();
+        }
+        else
+        {
+            Application.Current.Dispatcher.Invoke(action);
         }
     }
 
@@ -425,14 +514,41 @@ public class GameWindowViewModel : ViewModelBase
             }
 
             // Reset game state
+            _gameService.ResetLevel();
             GameInProgress = false;
             WordComplete = false;
             GameWon = false;
             WordDisplay = "";
             HangmanDisplay = "";
             GuessedLetters.Clear();
-            Level = 0;
+            ResetLetterTiles();
+            Level = _gameService.GetCurrentLevel();
             WrongCount = 0;
         }
+    }
+
+    private void InitializeLetterTiles()
+    {
+        LetterTiles = new ObservableCollection<LetterTileViewModel>(
+            Enumerable.Range('A', 26).Select(letter => new LetterTileViewModel((char)letter)));
+    }
+
+    private void ResetLetterTiles()
+    {
+        foreach (var tile in LetterTiles)
+        {
+            tile.State = LetterGuessState.Available;
+        }
+    }
+
+    private void UpdateLetterTile(char letter, bool isCorrect)
+    {
+        var tile = LetterTiles.FirstOrDefault(t => t.Letter == letter);
+        if (tile == null)
+        {
+            return;
+        }
+
+        tile.State = isCorrect ? LetterGuessState.Correct : LetterGuessState.Wrong;
     }
 }

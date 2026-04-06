@@ -103,5 +103,17 @@ namespace HangmanWpf.Views
                 await themeService.ApplyThemeAsync("DarkRed");
             }
         }
+
+        /// <summary>
+        /// Handle Statistics menu click
+        /// </summary>
+        private void OnStatisticsMenuClick(object sender, RoutedEventArgs e)
+        {
+            var statisticsWindow = new StatisticsWindow
+            {
+                Owner = this
+            };
+            statisticsWindow.ShowDialog();
+        }
     }
 }

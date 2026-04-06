@@ -7,50 +7,71 @@
         Background="{DynamicResource PrimaryBackground}"
         Foreground="{DynamicResource Foreground}"
         WindowStartupLocation="CenterScreen">
-    <DockPanel>
-        <!-- Title -->
-        <TextBlock DockPanel.Dock="Top"
-                   Text="Game Statistics"
-                   FontSize="20"
-                FontWeight="Bold"
-                   Foreground="{DynamicResource Accent}"
-                   Padding="20,10,20,0"/>
+        <DockPanel>
+                <!-- Title -->
+                <TextBlock DockPanel.Dock="Top"
+                           Text="Game Statistics"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource Accent}"
+                           Padding="20,10,20,0"/>
 
-        <!-- DataGrid -->
-        <DataGrid DockPanel.Dock="Top"
-                  ItemsSource="{Binding AllStatistics}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  Background="{DynamicResource SecondaryBackground}"
-                  Foreground="{DynamicResource Foreground}"
-                  BorderBrush="{DynamicResource Border}"
-                  Margin="20,10,20,10">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="User"
-                        Binding="{Binding UserId}"
-                        Width="*"/>
-                <DataGridTextColumn Header="Category"
-                        Binding="{Binding CategoryStats[0].Category}"
-                        Width="*"/>
-                <DataGridTextColumn Header="Played"
-                        Binding="{Binding CategoryStats[0].GamesPlayed}"
-                        Width="100"/>
-                <DataGridTextColumn Header="Won"
-                        Binding="{Binding CategoryStats[0].GamesWon}"
-                        Width="100"/>
-            </DataGrid.Columns>
-        </DataGrid>
+                <!-- DataGrid -->
+                <DataGrid DockPanel.Dock="Top"
+                          ItemsSource="{Binding StatisticsRows}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          Background="{DynamicResource SecondaryBackground}"
+                          Foreground="{DynamicResource Foreground}"
+                          BorderBrush="{DynamicResource Border}"
+                          RowBackground="{DynamicResource SecondaryBackground}"
+                          AlternatingRowBackground="{DynamicResource PrimaryBackground}"
+                          HeadersVisibility="Column"
+                          Margin="20,10,20,10">
+                        <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background"
+                                                        Value="{DynamicResource ButtonBackground}"/>
+                                        <Setter Property="Foreground"
+                                                        Value="{DynamicResource Foreground}"/>
+                                        <Setter Property="BorderBrush"
+                                                        Value="{DynamicResource Border}"/>
+                                </Style>
+                                <Style TargetType="DataGridCell">
+                                        <Setter Property="Foreground"
+                                                        Value="{DynamicResource Foreground}"/>
+                                        <Setter Property="Background"
+                                                        Value="Transparent"/>
+                                        <Setter Property="BorderBrush"
+                                                        Value="{DynamicResource Border}"/>
+                                </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                                <DataGridTextColumn Header="User"
+                                                    Binding="{Binding Username}"
+                                                    Width="*"/>
+                                <DataGridTextColumn Header="Category"
+                                                    Binding="{Binding Category}"
+                                                    Width="*"/>
+                                <DataGridTextColumn Header="Played"
+                                                    Binding="{Binding GamesPlayed}"
+                                                    Width="100"/>
+                                <DataGridTextColumn Header="Won"
+                                                    Binding="{Binding GamesWon}"
+                                                    Width="100"/>
+                        </DataGrid.Columns>
+                </DataGrid>
 
-        <!-- Close Button -->
-        <Button DockPanel.Dock="Bottom"
-                Content="Close"
-                Command="{Binding CloseCommand}"
-                Background="{DynamicResource ButtonBackground}"
-                Foreground="{DynamicResource Foreground}"
-                Width="100"
-                Height="35"
-                Margin="20"
-                HorizontalAlignment="Right"/>
-    </DockPanel>
+                <!-- Close Button -->
+                <Button DockPanel.Dock="Bottom"
+                        Content="Close"
+                        Command="{Binding CloseCommand}"
+                        Background="{DynamicResource ButtonBackground}"
+                        Foreground="{DynamicResource Foreground}"
+                        Width="100"
+                        Height="35"
+                        Margin="20"
+                        HorizontalAlignment="Right"/>
+        </DockPanel>
 </Window>

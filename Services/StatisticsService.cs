@@ -17,6 +17,8 @@ public class StatisticsService : IStatisticsService
 {
     private const string StatisticsFilePath = "Resources/Data/statistics.json";
 
+    public event Action? StatisticsChanged;
+
     /// <summary>
     /// Get statistics for a specific user
     /// </summary>
@@ -47,6 +49,7 @@ public class StatisticsService : IStatisticsService
             userStats.IncrementGamesWon(category);
 
         await SaveStatisticsAsync(allStats);
+        StatisticsChanged?.Invoke();
     }
 
     /// <summary>
@@ -91,6 +94,7 @@ public class StatisticsService : IStatisticsService
         {
             allStats.Remove(userStats);
             await SaveStatisticsAsync(allStats);
+            StatisticsChanged?.Invoke();
         }
     }
 

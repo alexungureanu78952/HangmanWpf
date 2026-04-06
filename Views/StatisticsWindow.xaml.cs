@@ -16,6 +16,7 @@ namespace HangmanWpf.Views
             // Set DataContext to StatisticsWindowViewModel from DI container
             var viewModel = App.ServiceProvider.GetRequiredService<StatisticsWindowViewModel>();
             DataContext = viewModel;
+            viewModel.CloseRequested += () => Close();
         }
     }
 }
