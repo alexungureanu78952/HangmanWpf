@@ -4,9 +4,17 @@ using System.Threading.Tasks;
 
 namespace HangmanWpf.Services.Interfaces;
 
-public interface IGameDialogService
+public interface IAboutDialogService
 {
-    Task ShowAboutDialogAsync();
-    Task ShowStatisticsDialogAsync();
-    Task<SavedGame?> ShowLoadGameDialogAsync(Guid userId);
+    Task ShowAsync();
+}
+
+public interface IStatisticsDialogService
+{
+    Task ShowAsync();
+}
+
+public interface IGameSaveLoadDialogService
+{
+    Task<SavedGame?> ShowAsync(Guid userId);
 }

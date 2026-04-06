@@ -40,7 +40,9 @@ public partial class App : Application
         // WordService and ThemeService are independent
         services.AddSingleton<IWordService, WordService>();
         services.AddSingleton<IThemeService, ThemeService>();
-        services.AddSingleton<IGameDialogService, GameDialogService>();
+        services.AddSingleton<IAboutDialogService, AboutDialogService>();
+        services.AddSingleton<IStatisticsDialogService, StatisticsDialogService>();
+        services.AddSingleton<IGameSaveLoadDialogService, GameSaveLoadDialogService>();
         services.AddSingleton<IUiDispatcher, UiDispatcher>();
 
         // GameService depends on WordService

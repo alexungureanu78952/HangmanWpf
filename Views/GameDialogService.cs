@@ -8,9 +8,9 @@ using System.Windows;
 
 namespace HangmanWpf.Views;
 
-public class GameDialogService : IGameDialogService
+public class AboutDialogService : IAboutDialogService
 {
-    public Task ShowAboutDialogAsync()
+    public Task ShowAsync()
     {
         var dialog = new AboutWindow();
         TrySetOwner(dialog);
@@ -18,7 +18,19 @@ public class GameDialogService : IGameDialogService
         return Task.CompletedTask;
     }
 
-    public Task ShowStatisticsDialogAsync()
+    private static void TrySetOwner(Window dialog)
+    {
+        var owner = Application.Current?.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+        if (owner != null && owner != dialog)
+        {
+            dialog.Owner = owner;
+        }
+    }
+}
+
+public class StatisticsDialogService : IStatisticsDialogService
+{
+    public Task ShowAsync()
     {
         var dialog = new StatisticsWindow();
         TrySetOwner(dialog);
@@ -26,11 +38,23 @@ public class GameDialogService : IGameDialogService
         return Task.CompletedTask;
     }
 
-    public Task<SavedGame?> ShowLoadGameDialogAsync(Guid userId)
+    private static void TrySetOwner(Window dialog)
+    {
+        var owner = Application.Current?.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+        if (owner != null && owner != dialog)
+        {
+            dialog.Owner = owner;
+        }
+    }
+}
+
+public class GameSaveLoadDialogService : IGameSaveLoadDialogService
+{
+    public async Task<SavedGame?> ShowAsync(Guid userId)
     {
         if (userId == Guid.Empty)
         {
-            return Task.FromResult<SavedGame?>(null);
+            return null;
         }
 
         var dialog = new SaveLoadDialog();
@@ -38,7 +62,7 @@ public class GameDialogService : IGameDialogService
 
         if (dialog.DataContext is not SaveLoadDialogViewModel viewModel)
         {
-            return Task.FromResult<SavedGame?>(null);
+            return null;
         }
 
         SavedGame? loadedGame = null;
@@ -68,7 +92,7 @@ public class GameDialogService : IGameDialogService
             viewModel.CancellationRequested -= OnCancelRequested;
         }
 
-        return Task.FromResult(loadedGame);
+        return loadedGame;
     }
 
     private static void TrySetOwner(Window dialog)

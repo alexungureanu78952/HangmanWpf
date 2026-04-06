@@ -20,7 +20,9 @@ public class GameWindowViewModel : ViewModelBase
     private readonly IGamePersistenceService _persistenceService;
     private readonly IStatisticsService _statisticsService;
     private readonly IThemeService _themeService;
-    private readonly IGameDialogService _gameDialogService;
+    private readonly IAboutDialogService _aboutDialogService;
+    private readonly IStatisticsDialogService _statisticsDialogService;
+    private readonly IGameSaveLoadDialogService _saveLoadDialogService;
     private readonly IUiDispatcher _uiDispatcher;
 
     private User _currentUser;
@@ -152,7 +154,9 @@ public class GameWindowViewModel : ViewModelBase
         IGamePersistenceService persistenceService,
         IStatisticsService statisticsService,
         IThemeService themeService,
-        IGameDialogService gameDialogService,
+        IAboutDialogService aboutDialogService,
+        IStatisticsDialogService statisticsDialogService,
+        IGameSaveLoadDialogService saveLoadDialogService,
         IUiDispatcher uiDispatcher)
     {
         _gameService = gameService ?? throw new ArgumentNullException(nameof(gameService));
@@ -160,7 +164,9 @@ public class GameWindowViewModel : ViewModelBase
         _persistenceService = persistenceService ?? throw new ArgumentNullException(nameof(persistenceService));
         _statisticsService = statisticsService ?? throw new ArgumentNullException(nameof(statisticsService));
         _themeService = themeService ?? throw new ArgumentNullException(nameof(themeService));
-        _gameDialogService = gameDialogService ?? throw new ArgumentNullException(nameof(gameDialogService));
+        _aboutDialogService = aboutDialogService ?? throw new ArgumentNullException(nameof(aboutDialogService));
+        _statisticsDialogService = statisticsDialogService ?? throw new ArgumentNullException(nameof(statisticsDialogService));
+        _saveLoadDialogService = saveLoadDialogService ?? throw new ArgumentNullException(nameof(saveLoadDialogService));
         _uiDispatcher = uiDispatcher ?? throw new ArgumentNullException(nameof(uiDispatcher));
 
         _currentUser = new User();
@@ -396,7 +402,7 @@ public class GameWindowViewModel : ViewModelBase
             return;
         }
 
-        var loadedGame = await _gameDialogService.ShowLoadGameDialogAsync(CurrentUser.UserId);
+        var loadedGame = await _saveLoadDialogService.ShowAsync(CurrentUser.UserId);
         if (loadedGame != null)
         {
             await RestoreSavedGameAsync(loadedGame);
@@ -405,12 +411,12 @@ public class GameWindowViewModel : ViewModelBase
 
     private System.Threading.Tasks.Task ShowStatisticsAsync()
     {
-        return _gameDialogService.ShowStatisticsDialogAsync();
+        return _statisticsDialogService.ShowAsync();
     }
 
     private System.Threading.Tasks.Task ShowAboutAsync()
     {
-        return _gameDialogService.ShowAboutDialogAsync();
+        return _aboutDialogService.ShowAsync();
     }
 
     /// <summary>
